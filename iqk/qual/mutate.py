@@ -142,7 +142,9 @@ class Workspace:
         bad = []
         for t in tests:
             try:
-                r = subprocess.run([str(self.build / "iqk_tests"), f"--gtest_filter={t}"], capture_output=True, timeout=30)
+                r = subprocess.run(
+                    [str(self.build / "iqk_tests"), f"--gtest_filter={t}"], capture_output=True, timeout=30
+                )
                 if r.returncode != 0:
                     bad.append(f"gtest:{t}")
             except subprocess.TimeoutExpired:
