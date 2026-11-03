@@ -1,0 +1,10 @@
+# expect: accept
+# '#' starts a comment anywhere on a line; a trailing comment on a statement is ignored.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m4g1@20
+# CAN: sum of group rates 20 Hz -> 20*135 = 2700 bit/s; total 2795 bit/s = 0.559 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 70 Hz -> 0.7 samples per 10 ms frame -> 1 packet(s); 9*0.7 + 1*(22+4+66) = 98.3 B/frame * 100 * 8 = 78640 bit/s (limit 2000000)
+iqk-plan 1   # header
+campaign blind1_c08 # campaign id
+channel t_1 aam:4:4 rate=20 range_mv=1000 # a trailing comment
+channel t_2 imu:temp rate=50#no space before the hash

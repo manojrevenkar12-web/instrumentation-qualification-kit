@@ -1,0 +1,15 @@
+# expect: reject PLN-05
+# Module 0, module 33, input 12, and IMU fields gyro_w and status. Each bad channel is alone in its
+# group at 10 Hz, so load is small however the unit counts invalid modules.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 4 -> 4*95 = 380 bit/s; groups m0g0@10, m1g0@10, m5g4@10, m33g0@10
+# CAN: sum of group rates 40 Hz -> 40*135 = 5400 bit/s; total 5780 bit/s = 1.156 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 240 Hz -> 2.4 samples per 10 ms frame -> 1 packet(s); 9*2.4 + 1*(22+4+66) = 113.6 B/frame * 100 * 8 = 90880 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel ok_1 aam:1:0 rate=10 range_mv=1000
+channel mod0 aam:0:0 rate=10 range_mv=1000
+channel mod33 aam:33:0 rate=10 range_mv=1000
+channel in12 aam:5:12 rate=10 range_mv=1000
+channel gw imu:gyro_w rate=100
+channel st imu:status rate=100

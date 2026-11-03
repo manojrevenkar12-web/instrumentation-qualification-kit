@@ -1,0 +1,13 @@
+# expect: reject PLN-02
+# Syntax errors on channel lines: an unknown key (gain), a key given twice (rate), a unit '10Hz'.
+# Each broken channel is alone in its group at a low rate, so no other rule depends on how it is read.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@100, m1g1@10, m1g2@10
+# CAN: sum of group rates 120 Hz -> 120*135 = 16200 bit/s; total 16295 bit/s = 3.259 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 120 Hz -> 1.2 samples per 10 ms frame -> 1 packet(s); 9*1.2 + 1*(22+4+66) = 102.8 B/frame * 100 * 8 = 82240 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel ok_1 aam:1:0 rate=100 range_mv=1000
+channel bad_gain aam:1:3 rate=10 range_mv=1000 gain=2
+channel bad_twice aam:1:6 rate=10 rate=10 range_mv=1000
+channel bad_unit aam:1:9 rate=10Hz range_mv=1000

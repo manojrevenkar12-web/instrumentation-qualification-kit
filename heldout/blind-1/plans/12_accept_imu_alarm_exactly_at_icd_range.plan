@@ -1,0 +1,9 @@
+# expect: accept
+# IMU alarms exactly at the IMU-SER ranges: gyro +/-8.727 rad/s, accel +/-156.9 m/s2, temp -40..85 degC.
+# CAN: no module channels -> 0 bit/s
+# TLM: total sample rate 850 Hz -> 8.5 samples per 10 ms frame -> 1 packet(s); 9*8.5 + 1*(22+4+66) = 168.5 B/frame * 100 * 8 = 134800 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel gx imu:gyro_x rate=400 alarm=-8.727,8.727
+channel ay imu:accel_y rate=400 alarm=-156.9,156.9
+channel it imu:temp rate=50 alarm=-40,85

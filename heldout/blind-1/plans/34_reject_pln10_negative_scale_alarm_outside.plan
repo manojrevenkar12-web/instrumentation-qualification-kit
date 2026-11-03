@@ -1,0 +1,9 @@
+# expect: reject PLN-10
+# Negative scale -4, offset 2 on 1 V measures [-2, 6]; alarm low -2.5 is below the minimum.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m9g0@50
+# CAN: sum of group rates 50 Hz -> 50*135 = 6750 bit/s; total 6845 bit/s = 1.369 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 50 Hz -> 0.5 samples per 10 ms frame -> 1 packet(s); 9*0.5 + 1*(22+4+66) = 96.5 B/frame * 100 * 8 = 77200 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel inv aam:9:1 rate=50 range_mv=1000 scale=-4 offset=2 alarm=-2.5,6

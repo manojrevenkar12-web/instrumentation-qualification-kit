@@ -41,6 +41,12 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("refs", nargs="*")
     a = sub.add_parser("assurance")
     a.add_argument("action", choices=["repro", "hardening", "sbom", "static", "sanitize"])
+    h = sub.add_parser("heldout")
+    h.add_argument("action", choices=["run"])
+    h.add_argument("set")
+    ag = sub.add_parser("agents")
+    ag.add_argument("--only", default="")
+    ag.add_argument("--models", default="haiku,sonnet")
     b = sub.add_parser("bench")
     b.add_argument("--seconds", type=float, default=20)
     b.add_argument("--plan", default=str(ROOT / "examples" / "plans" / "bench.plan"))
@@ -116,6 +122,25 @@ def main(argv: list[str] | None = None) -> int:
         _write(REPORTS / "assurance" / f"{args.action}.json", result)
         print(json.dumps({k: v for k, v in result.items() if k != "details"}, indent=1))
         return 0 if result.get("pass") else 1
+
+    if args.cmd == "heldout":
+        from . import heldout
+
+        print(json.dumps(heldout.run(args.set), indent=1))
+        return 0
+
+    if args.cmd == "agents":
+        from .agents import experiment
+
+        reqs = [x for x in args.only.split(",") if x] or None
+        drafts = experiment.run(Path("/tmp/iqk-agents"), reqs, args.models.split(","))
+        path = REPORTS / "agents" / "experiment.json"
+        old = json.loads(path.read_text())["drafts"] if path.exists() and reqs else []
+        keep = [d for d in old if (d["requirement"], d["model"]) not in {(x["requirement"], x["model"]) for x in drafts}]
+        all_drafts = keep + drafts
+        _write(path, {"summary": experiment.summarize(all_drafts), "drafts": all_drafts})
+        print(json.dumps(experiment.summarize(all_drafts), indent=1))
+        return 0
 
     if args.cmd == "bench":
         from .bench import Bench, Fault

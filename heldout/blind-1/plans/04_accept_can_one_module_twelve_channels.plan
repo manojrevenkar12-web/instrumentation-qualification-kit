@@ -1,0 +1,21 @@
+# expect: accept
+# All 12 inputs of one module. Load is per group frame, not per channel: 59.959 %.
+# Counting per channel instead would give about 180 % and wrongly reject.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@1000, m1g1@1000, m1g2@200, m1g3@20
+# CAN: sum of group rates 2220 Hz -> 2220*135 = 299700 bit/s; total 299795 bit/s = 59.959 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 6660 Hz -> 66.6 samples per 10 ms frame -> 2 packet(s); 9*66.6 + 2*(22+4+66) = 783.4 B/frame * 100 * 8 = 626720 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel m1_in0 aam:1:0 rate=1000 range_mv=1000
+channel m1_in1 aam:1:1 rate=1000 range_mv=1000
+channel m1_in2 aam:1:2 rate=1000 range_mv=1000
+channel m1_in3 aam:1:3 rate=1000 range_mv=1000
+channel m1_in4 aam:1:4 rate=1000 range_mv=1000
+channel m1_in5 aam:1:5 rate=1000 range_mv=1000
+channel m1_in6 aam:1:6 rate=200 range_mv=1000
+channel m1_in7 aam:1:7 rate=200 range_mv=1000
+channel m1_in8 aam:1:8 rate=200 range_mv=1000
+channel m1_in9 aam:1:9 rate=20 range_mv=1000
+channel m1_in10 aam:1:10 rate=20 range_mv=1000
+channel m1_in11 aam:1:11 rate=20 range_mv=1000

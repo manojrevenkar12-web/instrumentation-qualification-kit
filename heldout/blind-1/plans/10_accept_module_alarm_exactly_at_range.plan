@@ -1,0 +1,12 @@
+# expect: accept
+# Alarm limits exactly at the measurable ends. scale 2 x (+/-5 V) + 0.5 = [-9.5, 10.5];
+# default scale 1, offset 0 on 100 mV: [-0.1, 0.1]; scale 25 x (+/-10 V) - 50 = [-300, 200].
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m6g0@100, m6g1@100, m6g2@10
+# CAN: sum of group rates 210 Hz -> 210*135 = 28350 bit/s; total 28445 bit/s = 5.689 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 210 Hz -> 2.1 samples per 10 ms frame -> 1 packet(s); 9*2.1 + 1*(22+4+66) = 110.9 B/frame * 100 * 8 = 88720 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel lvdt aam:6:0 rate=100 range_mv=5000 scale=2 offset=0.5 alarm=-9.5,10.5
+channel shunt aam:6:3 rate=100 range_mv=100 alarm=-0.1,0.1
+channel oil_t aam:6:6 rate=10 range_mv=10000 scale=25 offset=-50 unit=degC alarm=-300,200

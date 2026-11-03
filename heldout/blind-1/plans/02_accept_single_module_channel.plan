@@ -1,0 +1,9 @@
+# expect: accept
+# One module channel at the fastest rate.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@1000
+# CAN: sum of group rates 1000 Hz -> 1000*135 = 135000 bit/s; total 135095 bit/s = 27.019 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 1000 Hz -> 10 samples per 10 ms frame -> 1 packet(s); 9*10 + 1*(22+4+66) = 182 B/frame * 100 * 8 = 145600 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel v_bus aam:1:0 rate=1000 range_mv=10000

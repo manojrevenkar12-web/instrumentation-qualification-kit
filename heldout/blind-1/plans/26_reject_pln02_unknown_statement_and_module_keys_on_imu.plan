@@ -1,0 +1,16 @@
+# expect: reject PLN-02
+# An unknown statement, and IMU channels given keys that exist only for module channels
+# (range_mv, scale, filter, offset, unit).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@100
+# CAN: sum of group rates 100 Hz -> 100*135 = 13500 bit/s; total 13595 bit/s = 2.719 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 600 Hz -> 6 samples per 10 ms frame -> 1 packet(s); 9*6 + 1*(22+4+66) = 146 B/frame * 100 * 8 = 116800 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+sensor s1 aam:1:0
+channel ok_1 aam:1:0 rate=100 range_mv=1000
+channel gx imu:gyro_x rate=100 range_mv=1000
+channel gy imu:gyro_y rate=100 scale=2
+channel gz imu:gyro_z rate=100 filter=lp_10hz
+channel ax imu:accel_x rate=100 offset=1
+channel ay imu:accel_y rate=100 unit=g

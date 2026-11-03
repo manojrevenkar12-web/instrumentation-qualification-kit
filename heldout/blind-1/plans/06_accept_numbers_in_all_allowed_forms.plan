@@ -1,0 +1,14 @@
+# expect: accept
+# Numbers written with fractions and exponents (500.0, 5e2, 1e1, 1e4). Two inputs of one group
+# have rates 5e2 and 500, which are the same rate (PLN-08 holds).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 2 -> 2*95 = 190 bit/s; groups m7g0@500, m7g1@1000, m8g3@10
+# CAN: sum of group rates 1510 Hz -> 1510*135 = 203850 bit/s; total 204040 bit/s = 40.808 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 2210 Hz -> 22.1 samples per 10 ms frame -> 1 packet(s); 9*22.1 + 1*(22+4+66) = 290.9 B/frame * 100 * 8 = 232720 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel p_a aam:7:0 rate=5e2 range_mv=1e4 scale=2.5e1 offset=-1.5 alarm=-2e2,2.0e2
+channel p_b aam:7:1 rate=500 range_mv=10000.0
+channel p_c aam:7:3 rate=1000.0 range_mv=5000 scale=0.5
+channel p_d aam:8:11 rate=1e1 range_mv=100
+channel yaw imu:gyro_z rate=200

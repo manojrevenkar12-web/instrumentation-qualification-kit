@@ -1,0 +1,12 @@
+# expect: reject PLN-09
+# Module 4 input 7 used by two channels (same rate), IMU accel_z used by two channels (same rate).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m4g2@50
+# CAN: sum of group rates 50 Hz -> 50*135 = 6750 bit/s; total 6845 bit/s = 1.369 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 500 Hz -> 5 samples per 10 ms frame -> 1 packet(s); 9*5 + 1*(22+4+66) = 137 B/frame * 100 * 8 = 109600 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel p1 aam:4:7 rate=50 range_mv=5000
+channel p1_copy aam:4:7 rate=50 range_mv=1000 scale=3
+channel az imu:accel_z rate=200
+channel az_copy imu:accel_z rate=200

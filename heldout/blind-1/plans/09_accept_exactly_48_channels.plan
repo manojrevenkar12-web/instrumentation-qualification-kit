@@ -1,0 +1,56 @@
+# expect: accept
+# Exactly 48 channels (the maximum): all 7 IMU fields plus 41 module channels.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 4 -> 4*95 = 380 bit/s; groups m1g0@100, m1g1@50, m1g2@20, m1g3@10, m2g0@10, m2g1@10, m2g2@10, m2g3@10, m3g0@10, m3g1@10, m3g2@10, m3g3@10, m4g0@10, m4g1@10
+# CAN: sum of group rates 280 Hz -> 280*135 = 37800 bit/s; total 38180 bit/s = 7.636 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 1180 Hz -> 11.8 samples per 10 ms frame -> 1 packet(s); 9*11.8 + 1*(22+4+66) = 198.2 B/frame * 100 * 8 = 158560 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel imu_gyro_x imu:gyro_x rate=50
+channel imu_gyro_y imu:gyro_y rate=50
+channel imu_gyro_z imu:gyro_z rate=50
+channel imu_accel_x imu:accel_x rate=50
+channel imu_accel_y imu:accel_y rate=50
+channel imu_accel_z imu:accel_z rate=50
+channel imu_temp imu:temp rate=50
+channel m1_0 aam:1:0 rate=100 range_mv=1000
+channel m1_1 aam:1:1 rate=100 range_mv=1000
+channel m1_2 aam:1:2 rate=100 range_mv=1000
+channel m1_3 aam:1:3 rate=50 range_mv=1000
+channel m1_4 aam:1:4 rate=50 range_mv=1000
+channel m1_5 aam:1:5 rate=50 range_mv=1000
+channel m1_6 aam:1:6 rate=20 range_mv=1000
+channel m1_7 aam:1:7 rate=20 range_mv=1000
+channel m1_8 aam:1:8 rate=20 range_mv=1000
+channel m1_9 aam:1:9 rate=10 range_mv=1000
+channel m1_10 aam:1:10 rate=10 range_mv=1000
+channel m1_11 aam:1:11 rate=10 range_mv=1000
+channel m2_0 aam:2:0 rate=10 range_mv=1000
+channel m2_1 aam:2:1 rate=10 range_mv=1000
+channel m2_2 aam:2:2 rate=10 range_mv=1000
+channel m2_3 aam:2:3 rate=10 range_mv=1000
+channel m2_4 aam:2:4 rate=10 range_mv=1000
+channel m2_5 aam:2:5 rate=10 range_mv=1000
+channel m2_6 aam:2:6 rate=10 range_mv=1000
+channel m2_7 aam:2:7 rate=10 range_mv=1000
+channel m2_8 aam:2:8 rate=10 range_mv=1000
+channel m2_9 aam:2:9 rate=10 range_mv=1000
+channel m2_10 aam:2:10 rate=10 range_mv=1000
+channel m2_11 aam:2:11 rate=10 range_mv=1000
+channel m3_0 aam:3:0 rate=10 range_mv=1000
+channel m3_1 aam:3:1 rate=10 range_mv=1000
+channel m3_2 aam:3:2 rate=10 range_mv=1000
+channel m3_3 aam:3:3 rate=10 range_mv=1000
+channel m3_4 aam:3:4 rate=10 range_mv=1000
+channel m3_5 aam:3:5 rate=10 range_mv=1000
+channel m3_6 aam:3:6 rate=10 range_mv=1000
+channel m3_7 aam:3:7 rate=10 range_mv=1000
+channel m3_8 aam:3:8 rate=10 range_mv=1000
+channel m3_9 aam:3:9 rate=10 range_mv=1000
+channel m3_10 aam:3:10 rate=10 range_mv=1000
+channel m3_11 aam:3:11 rate=10 range_mv=1000
+channel m4_0 aam:4:0 rate=10 range_mv=1000
+channel m4_1 aam:4:1 rate=10 range_mv=1000
+channel m4_2 aam:4:2 rate=10 range_mv=1000
+channel m4_3 aam:4:3 rate=10 range_mv=1000
+channel m4_4 aam:4:4 rate=10 range_mv=1000

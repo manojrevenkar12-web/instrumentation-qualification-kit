@@ -1,0 +1,19 @@
+# expect: accept
+# Looks odd but is valid: names '0', '_' and a 16-character name; tabs and repeated spaces between
+# tokens; blank and comment lines; keys in unusual order; module 32 input 11; inputs 2 and 3 of one
+# module at different rates (different groups); the same input number on two modules at different rates.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 3 -> 3*95 = 285 bit/s; groups m1g0@100, m1g1@10, m2g0@50, m32g3@1000
+# CAN: sum of group rates 1160 Hz -> 1160*135 = 156600 bit/s; total 156885 bit/s = 31.377 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 1260 Hz -> 12.6 samples per 10 ms frame -> 1 packet(s); 9*12.6 + 1*(22+4+66) = 205.4 B/frame * 100 * 8 = 164320 bit/s (limit 2000000)
+iqk-plan 1
+
+# a comment line between statements
+campaign	blind1_c07
+
+channel	0	aam:1:2	alarm=-0.5,0.5  range_mv=1000	rate=100
+channel   _   aam:1:3   unit=V   rate=10   range_mv=1000
+channel abcdefghij_12345 aam:32:11 filter=lp_10hz range_mv=100 rate=1000
+channel a1_b2 aam:2:2 range_mv=1000 rate=50
+
+channel	gx	imu:gyro_x	alarm=-1,1	rate=100

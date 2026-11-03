@@ -1,0 +1,12 @@
+# expect: reject PLN-11
+# One module, groups at 1000, 1000, 200 and 50 Hz: 303845 bit/s = 60.769 %.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@1000, m1g1@1000, m1g2@200, m1g3@50
+# CAN: sum of group rates 2250 Hz -> 2250*135 = 303750 bit/s; total 303845 bit/s = 60.769 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 2250 Hz -> 22.5 samples per 10 ms frame -> 1 packet(s); 9*22.5 + 1*(22+4+66) = 294.5 B/frame * 100 * 8 = 235600 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel g0 aam:1:0 rate=1000 range_mv=1000
+channel g1 aam:1:3 rate=1000 range_mv=1000
+channel g2 aam:1:6 rate=200 range_mv=1000
+channel g3 aam:1:9 rate=50 range_mv=1000

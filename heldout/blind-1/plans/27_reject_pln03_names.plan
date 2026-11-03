@@ -1,0 +1,13 @@
+# expect: reject PLN-03
+# Names: uppercase, 17 characters, a hyphen, and a name used twice (on different inputs).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@10, m1g1@10
+# CAN: sum of group rates 20 Hz -> 20*135 = 2700 bit/s; total 2795 bit/s = 0.559 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 50 Hz -> 0.5 samples per 10 ms frame -> 1 packet(s); 9*0.5 + 1*(22+4+66) = 96.5 B/frame * 100 * 8 = 77200 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel Temp1 aam:1:0 rate=10 range_mv=1000
+channel abcdefghij_123456 aam:1:1 rate=10 range_mv=1000
+channel oil-temp aam:1:2 rate=10 range_mv=1000
+channel twice aam:1:3 rate=10 range_mv=1000
+channel twice aam:1:4 rate=10 range_mv=1000

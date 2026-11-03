@@ -1,0 +1,10 @@
+# expect: reject PLN-10
+# alarm lo equal to hi, and lo greater than hi, both inside the measurable range.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@100
+# CAN: sum of group rates 100 Hz -> 100*135 = 13500 bit/s; total 13595 bit/s = 2.719 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 200 Hz -> 2 samples per 10 ms frame -> 1 packet(s); 9*2 + 1*(22+4+66) = 110 B/frame * 100 * 8 = 88000 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel eq aam:1:0 rate=100 range_mv=10000 alarm=5,5
+channel rev imu:gyro_x rate=100 alarm=1,-1

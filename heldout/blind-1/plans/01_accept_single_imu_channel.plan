@@ -1,0 +1,7 @@
+# expect: accept
+# Smallest valid plan: one IMU channel, no modules (no CAN load at all).
+# CAN: no module channels -> 0 bit/s
+# TLM: total sample rate 400 Hz -> 4 samples per 10 ms frame -> 1 packet(s); 9*4 + 1*(22+4+66) = 128 B/frame * 100 * 8 = 102400 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel acc_z imu:accel_z rate=400

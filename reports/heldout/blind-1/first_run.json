@@ -1,0 +1,593 @@
+{
+ "summary": {
+  "set": "blind-1",
+  "recorded_at": "2026-11-03T10:00:51+00:00",
+  "vectors": 50,
+  "vectors_pass": 50,
+  "plans": 40,
+  "plans_pass": 39,
+  "plans_accept_refuse_right": 39
+ },
+ "results": [
+  {
+   "name": "aam heartbeat operational, overrange and config_crc bits",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam heartbeat one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam heartbeat one byte long",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam data group 3, i16 extremes and minus one",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam data distinct bytes per field (byte order check)",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam data one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam data one byte long",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam register write request, divisor of channel 5 (unaligned u16 index)",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam register read response, config_crc",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam register abort response, u32 max abort code",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam nmt start node 32",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "aam nmt one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu sample, all fields set",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu sample at the negative ends of every ICD range, u16/u32 maxima",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu sample at the positive ends of every ICD range",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu sample minus one in every signed field",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu sample one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu sample one byte long",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu bit result, failed with code 0x0102",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu command run self-test, arg u16 max",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "imu command one byte long",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "gnss time pulse, 3D fix, all flags",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "gnss time pulse, last ms of the week, u16/u32 maxima, no fix",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "gnss time pulse one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "gnss time pulse one byte long",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp sync, two-step, 8 Hz (log_interval -3)",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp follow up, 48-bit origin_s with distinct bytes, origin_ns 999999999, correction -1",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp follow up, origin_s u48 max, correction i64 min",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp delay req, correction i64 max, log_interval i8 min",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp delay resp, 54 bytes with requesting port identity",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp sync one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "ptp delay resp one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet with zero samples",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet with one sample, i32 min value, u64 max time",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet with three samples, i32 max, u16 max, distinct bytes",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet with the maximum 48 samples",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet with 49 samples (one more than allowed)",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet count says 2 but three samples follow",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet count says 3 but two samples follow",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet one sample plus one stray byte",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tlm packet header one byte short (no count byte)",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag request status",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag request one byte long",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag status, unaligned fields, offset_ns i32 min",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag status one byte short",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag faults with zero records",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag faults with one record, negative detail",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag faults with the maximum 32 records",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag faults with 33 records (one more than allowed)",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "diag faults count says 1 but no record follows",
+   "kind": "vector",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "01_accept_single_imu_channel.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "02_accept_single_module_channel.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "03_accept_typical_flight_test.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "04_accept_can_one_module_twelve_channels.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "05_accept_can_closest_below_60_percent.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "06_accept_numbers_in_all_allowed_forms.plan",
+   "kind": "plan",
+   "pass": false,
+   "detail": "refused with ['PLN-02']",
+   "refused_as_expected": false
+  },
+  {
+   "name": "07_accept_names_whitespace_key_order.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "08_accept_inline_comment.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "09_accept_exactly_48_channels.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "10_accept_module_alarm_exactly_at_range.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "11_accept_negative_scale_alarm_at_ends.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "12_accept_imu_alarm_exactly_at_icd_range.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "13_accept_all_imu_rates_and_fields.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "14_reject_can_heartbeats_tip_over_60.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "15_reject_can_one_module_over_60.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "16_reject_can_only_telemetry_just_fits.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "17_reject_pln04_zero_channels.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "18_reject_pln04_49_channels.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "19_reject_pln01_wrong_version.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "20_reject_pln01_header_missing.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "21_reject_pln02_bad_keys_and_values.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "22_reject_pln02_nan_inf_missing.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "23_reject_pln02_two_campaigns.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "24_reject_pln02_no_campaign.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "25_reject_pln02_campaign_two_tokens.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "26_reject_pln02_unknown_statement_and_module_keys_on_imu.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "27_reject_pln03_names.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "28_reject_pln05_module_input_field.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "29_reject_pln06_rates.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "30_reject_pln07_range_and_filter.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "31_reject_pln08_same_group_different_rates.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "32_reject_pln09_input_and_field_used_twice.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "33_reject_pln10_module_alarm_just_beyond.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "34_reject_pln10_negative_scale_alarm_outside.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "35_reject_pln10_imu_alarm_beyond.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "36_reject_pln10_alarm_order.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "37_reject_pln13_scale_zero.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "38_reject_can_and_telemetry.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "39_reject_names_rates_alarm_scale.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  },
+  {
+   "name": "40_reject_range_duplicate_can.plan",
+   "kind": "plan",
+   "pass": true,
+   "detail": "",
+   "refused_as_expected": true
+  }
+ ]
+}

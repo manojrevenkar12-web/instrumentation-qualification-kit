@@ -1,0 +1,15 @@
+# expect: accept
+# A typical mixed plan using every optional key on module channels and alarms on both sources.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 2 -> 2*95 = 190 bit/s; groups m2g0@500, m2g1@100, m5g3@10
+# CAN: sum of group rates 610 Hz -> 610*135 = 82350 bit/s; total 82540 bit/s = 16.508 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 1860 Hz -> 18.6 samples per 10 ms frame -> 1 packet(s); 9*18.6 + 1*(22+4+66) = 259.4 B/frame * 100 * 8 = 207520 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel strain_1 aam:2:0 rate=500 range_mv=100 filter=lp_100hz scale=2000 offset=0 unit=ustrain alarm=-150,150
+channel strain_2 aam:2:1 rate=500 range_mv=100 filter=lp_100hz scale=2000 unit=ustrain
+channel strain_3 aam:2:2 rate=500 range_mv=100 filter=lp_100hz scale=2000 unit=ustrain
+channel press_1 aam:2:3 rate=100 range_mv=5000 filter=lp_10hz scale=20 offset=0 unit=bar alarm=0,90
+channel temp_oil aam:5:9 rate=10 range_mv=10000 filter=none scale=25 offset=-50 unit=degC alarm=-40,150
+channel gyro_z imu:gyro_z rate=200 alarm=-5,5
+channel imu_temp imu:temp rate=50

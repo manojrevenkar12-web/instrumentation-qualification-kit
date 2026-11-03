@@ -1,0 +1,17 @@
+# expect: reject PLN-06
+# Module rates 250 (1000/4), 400 (1000/2.5), 5 (1000/200) and 1 (1000/1000); IMU rates 1000, 25 and 300.
+# Each module channel is alone in its group.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 2 -> 2*95 = 190 bit/s; groups m1g0@500, m1g1@250, m1g2@400, m1g3@5, m2g0@1
+# CAN: sum of group rates 1156 Hz -> 1156*135 = 156060 bit/s; total 156250 bit/s = 31.250 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 2481 Hz -> 24.81 samples per 10 ms frame -> 1 packet(s); 9*24.81 + 1*(22+4+66) = 315.29 B/frame * 100 * 8 = 252232 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel ok_1 aam:1:0 rate=500 range_mv=1000
+channel r250 aam:1:3 rate=250 range_mv=1000
+channel r400 aam:1:6 rate=400 range_mv=1000
+channel r5 aam:1:9 rate=5 range_mv=1000
+channel r1 aam:2:0 rate=1 range_mv=1000
+channel gx imu:gyro_x rate=1000
+channel gy imu:gyro_y rate=25
+channel gz imu:gyro_z rate=300

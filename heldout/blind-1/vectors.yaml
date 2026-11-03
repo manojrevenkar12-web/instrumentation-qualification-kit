@@ -1,0 +1,398 @@
+# Held-out codec vectors, set blind-1.
+# Written by an independent Claude session from docs/icd/*.md only (see README.md).
+# Payloads exclude framing and any CRC trailer. Field values are raw integers.
+cases:
+  - name: aam heartbeat operational, overrange and config_crc bits
+    icd: aam
+    message: aam_heartbeat
+    payload_hex: "02071200"   # 4 bytes
+    expect: decode
+    fields: {state: 2, counter: 7, errors: 18}
+  - name: aam heartbeat one byte short
+    icd: aam
+    message: aam_heartbeat
+    payload_hex: "020712"   # 3 bytes
+    expect: reject
+  - name: aam heartbeat one byte long
+    icd: aam
+    message: aam_heartbeat
+    payload_hex: "0207120000"   # 5 bytes
+    expect: reject
+  - name: aam data group 3, i16 extremes and minus one
+    icd: aam
+    message: aam_data
+    payload_hex: "03c80080ff7fffff"   # 8 bytes
+    expect: decode
+    fields: {mux: 3, counter: 200, ch_a: -32768, ch_b: 32767, ch_c: -1}
+  - name: aam data distinct bytes per field (byte order check)
+    icd: aam
+    message: aam_data
+    payload_hex: "01423412cced0201"   # 8 bytes
+    expect: decode
+    fields: {mux: 1, counter: 66, ch_a: 4660, ch_b: -4660, ch_c: 258}
+  - name: aam data one byte short
+    icd: aam
+    message: aam_data
+    payload_hex: "03c80080ff7fff"   # 7 bytes
+    expect: reject
+  - name: aam data one byte long
+    icd: aam
+    message: aam_data
+    payload_hex: "03c80080ff7fffff55"   # 9 bytes
+    expect: reject
+  - name: aam register write request, divisor of channel 5 (unaligned u16 index)
+    icd: aam
+    message: aam_reg_request
+    payload_hex: "2305200314000000"   # 8 bytes
+    expect: decode
+    fields: {cmd: 35, index: 8197, sub: 3, value: 20}
+  - name: aam register read response, config_crc
+    icd: aam
+    message: aam_reg_response
+    payload_hex: "43011f00efbeadde"   # 8 bytes
+    expect: decode
+    fields: {cmd: 67, index: 7937, sub: 0, value: 3735928559}
+  - name: aam register abort response, u32 max abort code
+    icd: aam
+    message: aam_reg_response
+    payload_hex: "800b2002ffffffff"   # 8 bytes
+    expect: decode
+    fields: {cmd: 128, index: 8203, sub: 2, value: 4294967295}
+  - name: aam nmt start node 32
+    icd: aam
+    message: aam_nmt
+    payload_hex: "0120"   # 2 bytes
+    expect: decode
+    fields: {cmd: 1, node: 32}
+  - name: aam nmt one byte short
+    icd: aam
+    message: aam_nmt
+    payload_hex: "81"   # 1 bytes
+    expect: reject
+  - name: imu sample, all fields set
+    icd: imu
+    message: imu_sample
+    payload_hex: "02010d0c0b0a87d612003235dcffd8298500f807f1ff393000001069ef00e90907"   # 33 bytes
+    expect: decode
+    fields: {seq: 258, t_us: 168496141, gyro_x: 1234567, gyro_y: -2345678, gyro_z: 8727000, accel_x: -981000, accel_y: 12345, accel_z: 15690000, temp: 2537, status: 7}
+  - name: imu sample at the negative ends of every ICD range, u16/u32 maxima
+    icd: imu
+    message: imu_sample
+    payload_hex: "ffffffffffff28d67aff28d67aff28d67afff09610fff09610fff09610ff60f00f"   # 33 bytes
+    expect: decode
+    fields: {seq: 65535, t_us: 4294967295, gyro_x: -8727000, gyro_y: -8727000, gyro_z: -8727000, accel_x: -15690000, accel_y: -15690000, accel_z: -15690000, temp: -4000, status: 15}
+  - name: imu sample at the positive ends of every ICD range
+    icd: imu
+    message: imu_sample
+    payload_hex: "000000000000d8298500d8298500d82985001069ef001069ef001069ef00342100"   # 33 bytes
+    expect: decode
+    fields: {seq: 0, t_us: 0, gyro_x: 8727000, gyro_y: 8727000, gyro_z: 8727000, accel_x: 15690000, accel_y: 15690000, accel_z: 15690000, temp: 8500, status: 0}
+  - name: imu sample minus one in every signed field
+    icd: imu
+    message: imu_sample
+    payload_hex: "010001000000ffffffffffffffffffffffffffffffffffffffffffffffffffff08"   # 33 bytes
+    expect: decode
+    fields: {seq: 1, t_us: 1, gyro_x: -1, gyro_y: -1, gyro_z: -1, accel_x: -1, accel_y: -1, accel_z: -1, temp: -1, status: 8}
+  - name: imu sample one byte short
+    icd: imu
+    message: imu_sample
+    payload_hex: "02010d0c0b0a87d612003235dcffd8298500f807f1ff393000001069ef00e909"   # 32 bytes
+    expect: reject
+  - name: imu sample one byte long
+    icd: imu
+    message: imu_sample
+    payload_hex: "02010d0c0b0a87d612003235dcffd8298500f807f1ff393000001069ef00e9090700"   # 34 bytes
+    expect: reject
+  - name: imu bit result, failed with code 0x0102
+    icd: imu
+    message: imu_bit_result
+    payload_hex: "010201"   # 3 bytes
+    expect: decode
+    fields: {result: 1, code: 258}
+  - name: imu command run self-test, arg u16 max
+    icd: imu
+    message: imu_command
+    payload_hex: "03ffff"   # 3 bytes
+    expect: decode
+    fields: {cmd: 3, arg: 65535}
+  - name: imu command one byte long
+    icd: imu
+    message: imu_command
+    payload_hex: "01000000"   # 4 bytes
+    expect: reject
+  - name: gnss time pulse, 3D fix, all flags
+    icd: gnss
+    message: time_pulse
+    payload_hex: "57090070991412030719000000"   # 13 bytes
+    expect: decode
+    fields: {week: 2391, tow_ms: 345600000, leap_s: 18, fix: 3, flags: 7, acc_ns: 25}
+  - name: gnss time pulse, last ms of the week, u16/u32 maxima, no fix
+    icd: gnss
+    message: time_pulse
+    payload_hex: "ffffff830c24000000ffffffff"   # 13 bytes
+    expect: decode
+    fields: {week: 65535, tow_ms: 604799999, leap_s: 0, fix: 0, flags: 0, acc_ns: 4294967295}
+  - name: gnss time pulse one byte short
+    icd: gnss
+    message: time_pulse
+    payload_hex: "570900709914120307190000"   # 12 bytes
+    expect: reject
+  - name: gnss time pulse one byte long
+    icd: gnss
+    message: time_pulse
+    payload_hex: "5709007099141203071900000000"   # 14 bytes
+    expect: reject
+  - name: ptp sync, two-step, 8 Hz (log_interval -3)
+    icd: ptp
+    message: ptp_sync
+    payload_hex: "0002002c0000020000000000000000000000000000112233445566770001123400fd00000000000000000000"   # 44 bytes
+    expect: decode
+    fields: {type_sdo: 0, version: 2, length: 44, domain: 0, minor_sdo: 0, flags: 512, correction: 0, type_specific: 0, clock_identity: 4822678189205111, port_number: 1, sequence_id: 4660, control: 0, log_interval: -3, origin_s: 0, origin_ns: 0}
+  - name: ptp follow up, 48-bit origin_s with distinct bytes, origin_ns 999999999, correction -1
+    icd: ptp
+    message: ptp_follow_up
+    payload_hex: "0802002c00000000ffffffffffffffff0000000000112233445566770001123402fd0102030405063b9ac9ff"   # 44 bytes
+    expect: decode
+    fields: {type_sdo: 8, version: 2, length: 44, domain: 0, minor_sdo: 0, flags: 0, correction: -1, type_specific: 0, clock_identity: 4822678189205111, port_number: 1, sequence_id: 4660, control: 2, log_interval: -3, origin_s: 1108152157446, origin_ns: 999999999}
+  - name: ptp follow up, origin_s u48 max, correction i64 min
+    icd: ptp
+    message: ptp_follow_up
+    payload_hex: "0802002c00000000800000000000000000000000ffffffffffffffffffffffff027fffffffffffff00000000"   # 44 bytes
+    expect: decode
+    fields: {type_sdo: 8, version: 2, length: 44, domain: 0, minor_sdo: 0, flags: 0, correction: -9223372036854775808, type_specific: 0, clock_identity: 18446744073709551615, port_number: 65535, sequence_id: 65535, control: 2, log_interval: 127, origin_s: 281474976710655, origin_ns: 0}
+  - name: ptp delay req, correction i64 max, log_interval i8 min
+    icd: ptp
+    message: ptp_delay_req
+    payload_hex: "0102002c000000007fffffffffffffff000000008899aabbccddeeff00020001018000006907f080075bcd15"   # 44 bytes
+    expect: decode
+    fields: {type_sdo: 1, version: 2, length: 44, domain: 0, minor_sdo: 0, flags: 0, correction: 9223372036854775807, type_specific: 0, clock_identity: 9843086184167632639, port_number: 2, sequence_id: 1, control: 1, log_interval: -128, origin_s: 1762128000, origin_ns: 123456789}
+  - name: ptp delay resp, 54 bytes with requesting port identity
+    icd: ptp
+    message: ptp_delay_resp
+    payload_hex: "0902003600000000000000000001000000000000001122334455667700010001030000006907f080000001f48899aabbccddeeffffff"   # 54 bytes
+    expect: decode
+    fields: {type_sdo: 9, version: 2, length: 54, domain: 0, minor_sdo: 0, flags: 0, correction: 65536, type_specific: 0, clock_identity: 4822678189205111, port_number: 1, sequence_id: 1, control: 3, log_interval: 0, receive_s: 1762128000, receive_ns: 500, req_clock_identity: 9843086184167632639, req_port_number: 65535}
+  - name: ptp sync one byte short
+    icd: ptp
+    message: ptp_sync
+    payload_hex: "0002002c0000020000000000000000000000000000112233445566770001123400fd000000000000000000"   # 43 bytes
+    expect: reject
+  - name: ptp delay resp one byte short
+    icd: ptp
+    message: ptp_delay_resp
+    payload_hex: "0902003600000000000000000001000000000000001122334455667700010001030000006907f080000001f48899aabbccddeeffff"   # 53 bytes
+    expect: reject
+  - name: tlm packet with zero samples
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b0000000015cd20781456741803d4c3b2a100"   # 22 bytes
+    expect: decode
+    fields:
+      magic: 1263618388
+      seq: 0
+      time_ns: 1762128000123456789
+      time_quality: 3
+      plan_crc: 2712847316
+      samples: []
+  - name: tlm packet with one sample, i32 min value, u64 max time
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514bffffffffffffffffffffffff0000000000012f000627000000800f"   # 31 bytes
+    expect: decode
+    fields:
+      magic: 1263618388
+      seq: 4294967295
+      time_ns: 18446744073709551615
+      time_quality: 0
+      plan_crc: 0
+      samples:
+      - {channel: 47, dt_us: 9990, value: -2147483648, flags: 15}
+  - name: tlm packet with three samples, i32 max, u16 max, distinct bytes
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b040302010807060504030201020d0c0b0a0300000000ffffff7f00fffffffffbffffff02020104030807060504"   # 49 bytes
+    expect: decode
+    fields:
+      magic: 1263618388
+      seq: 16909060
+      time_ns: 72623859790382856
+      time_quality: 2
+      plan_crc: 168496141
+      samples:
+      - {channel: 0, dt_us: 0, value: 2147483647, flags: 0}
+      - {channel: 65535, dt_us: 65535, value: -5, flags: 2}
+      - {channel: 258, dt_us: 772, value: 84281096, flags: 4}
+  - name: tlm packet with the maximum 48 samples
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b40e201000000c5701456741801efcdab893000000000b860dbff000100e8035be7dcff010200d007fe6ddeff020300b80ba1f4dfff030400a00f447be1ff0405008813e701e3ff05060070178a88e4ff060700581b2d0fe6ff070800401fd095e7ff0809002823731ce9ff090a00000016a3eaff0a0b00e803b929ecff0b0c00d0075cb0edff0c0d00b80bff36efff0d0e00a00fa2bdf0ff0e0f0088134544f2ff0f10007017e8caf3ff001100581b8b51f5ff011200401f2ed8f6ff0213002823d15ef8ff031400000074e5f9ff041500e803176cfbff051600d007baf2fcff061700b80b5d79feff071800a00f000000000819008813a3860100091a007017460d03000a1b00581be99304000b1c00401f8c1a06000c1d0028232fa107000d1e000000d22709000e1f00e80375ae0a000f2000d00718350c00002100b80bbbbb0d00012200a00f5e420f00022300881301c910000324007017a44f1200042500581b47d61300052600401fea5c150006270028238de316000728000000306a1800082900e803d3f01900092a00d00776771b000a2b00b80b19fe1c000b2c00a00fbc841e000c2d0088135f0b20000d2e007017029221000e2f00581ba51823000f"   # 454 bytes
+    expect: decode
+    fields:
+      magic: 1263618388
+      seq: 123456
+      time_ns: 1762128000000000000
+      time_quality: 1
+      plan_crc: 2309737967
+      samples:
+      - {channel: 0, dt_us: 0, value: -2400072, flags: 0}
+      - {channel: 1, dt_us: 1000, value: -2300069, flags: 1}
+      - {channel: 2, dt_us: 2000, value: -2200066, flags: 2}
+      - {channel: 3, dt_us: 3000, value: -2100063, flags: 3}
+      - {channel: 4, dt_us: 4000, value: -2000060, flags: 4}
+      - {channel: 5, dt_us: 5000, value: -1900057, flags: 5}
+      - {channel: 6, dt_us: 6000, value: -1800054, flags: 6}
+      - {channel: 7, dt_us: 7000, value: -1700051, flags: 7}
+      - {channel: 8, dt_us: 8000, value: -1600048, flags: 8}
+      - {channel: 9, dt_us: 9000, value: -1500045, flags: 9}
+      - {channel: 10, dt_us: 0, value: -1400042, flags: 10}
+      - {channel: 11, dt_us: 1000, value: -1300039, flags: 11}
+      - {channel: 12, dt_us: 2000, value: -1200036, flags: 12}
+      - {channel: 13, dt_us: 3000, value: -1100033, flags: 13}
+      - {channel: 14, dt_us: 4000, value: -1000030, flags: 14}
+      - {channel: 15, dt_us: 5000, value: -900027, flags: 15}
+      - {channel: 16, dt_us: 6000, value: -800024, flags: 0}
+      - {channel: 17, dt_us: 7000, value: -700021, flags: 1}
+      - {channel: 18, dt_us: 8000, value: -600018, flags: 2}
+      - {channel: 19, dt_us: 9000, value: -500015, flags: 3}
+      - {channel: 20, dt_us: 0, value: -400012, flags: 4}
+      - {channel: 21, dt_us: 1000, value: -300009, flags: 5}
+      - {channel: 22, dt_us: 2000, value: -200006, flags: 6}
+      - {channel: 23, dt_us: 3000, value: -100003, flags: 7}
+      - {channel: 24, dt_us: 4000, value: 0, flags: 8}
+      - {channel: 25, dt_us: 5000, value: 100003, flags: 9}
+      - {channel: 26, dt_us: 6000, value: 200006, flags: 10}
+      - {channel: 27, dt_us: 7000, value: 300009, flags: 11}
+      - {channel: 28, dt_us: 8000, value: 400012, flags: 12}
+      - {channel: 29, dt_us: 9000, value: 500015, flags: 13}
+      - {channel: 30, dt_us: 0, value: 600018, flags: 14}
+      - {channel: 31, dt_us: 1000, value: 700021, flags: 15}
+      - {channel: 32, dt_us: 2000, value: 800024, flags: 0}
+      - {channel: 33, dt_us: 3000, value: 900027, flags: 1}
+      - {channel: 34, dt_us: 4000, value: 1000030, flags: 2}
+      - {channel: 35, dt_us: 5000, value: 1100033, flags: 3}
+      - {channel: 36, dt_us: 6000, value: 1200036, flags: 4}
+      - {channel: 37, dt_us: 7000, value: 1300039, flags: 5}
+      - {channel: 38, dt_us: 8000, value: 1400042, flags: 6}
+      - {channel: 39, dt_us: 9000, value: 1500045, flags: 7}
+      - {channel: 40, dt_us: 0, value: 1600048, flags: 8}
+      - {channel: 41, dt_us: 1000, value: 1700051, flags: 9}
+      - {channel: 42, dt_us: 2000, value: 1800054, flags: 10}
+      - {channel: 43, dt_us: 3000, value: 1900057, flags: 11}
+      - {channel: 44, dt_us: 4000, value: 2000060, flags: 12}
+      - {channel: 45, dt_us: 5000, value: 2100063, flags: 13}
+      - {channel: 46, dt_us: 6000, value: 2200066, flags: 14}
+      - {channel: 47, dt_us: 7000, value: 2300069, flags: 15}
+  - name: tlm packet with 49 samples (one more than allowed)
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b40e201000000c5701456741801efcdab893100000000b860dbff000100e8035be7dcff010200d007fe6ddeff020300b80ba1f4dfff030400a00f447be1ff0405008813e701e3ff05060070178a88e4ff060700581b2d0fe6ff070800401fd095e7ff0809002823731ce9ff090a00000016a3eaff0a0b00e803b929ecff0b0c00d0075cb0edff0c0d00b80bff36efff0d0e00a00fa2bdf0ff0e0f0088134544f2ff0f10007017e8caf3ff001100581b8b51f5ff011200401f2ed8f6ff0213002823d15ef8ff031400000074e5f9ff041500e803176cfbff051600d007baf2fcff061700b80b5d79feff071800a00f000000000819008813a3860100091a007017460d03000a1b00581be99304000b1c00401f8c1a06000c1d0028232fa107000d1e000000d22709000e1f00e80375ae0a000f2000d00718350c00002100b80bbbbb0d00012200a00f5e420f00022300881301c910000324007017a44f1200042500581b47d61300052600401fea5c150006270028238de316000728000000306a1800082900e803d3f01900092a00d00776771b000a2b00b80b19fe1c000b2c00a00fbc841e000c2d0088135f0b20000d2e007017029221000e2f00581ba51823000f300000000000000000"   # 463 bytes
+    expect: reject
+  - name: tlm packet count says 2 but three samples follow
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b040302010807060504030201020d0c0b0a0200000000ffffff7f00fffffffffbffffff02020104030807060504"   # 49 bytes
+    expect: reject
+  - name: tlm packet count says 3 but two samples follow
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b040302010807060504030201020d0c0b0a0300000000ffffff7f00fffffffffbffffff02"   # 40 bytes
+    expect: reject
+  - name: tlm packet one sample plus one stray byte
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514bffffffffffffffffffffffff0000000000012f000627000000800f00"   # 32 bytes
+    expect: reject
+  - name: tlm packet header one byte short (no count byte)
+    icd: tlm
+    message: tlm_packet
+    payload_hex: "5449514b0000000015cd20781456741803d4c3b2a1"   # 21 bytes
+    expect: reject
+  - name: diag request status
+    icd: tlm
+    message: diag_request
+    payload_hex: "01"   # 1 bytes
+    expect: decode
+    fields: {what: 1}
+  - name: diag request one byte long
+    icd: tlm
+    message: diag_request
+    payload_hex: "0200"   # 2 bytes
+    expect: reject
+  - name: diag status, unaligned fields, offset_ns i32 min
+    icd: tlm
+    message: diag_status
+    payload_hex: "8051010000030100013f000202000000800300000000000000ffffffffd4c3b2a1ffff"   # 35 bytes
+    expect: decode
+    fields: {uptime_s: 86400, sw_version: 66304, slot: 1, bit: 63, time_state: 2, time_source: 2, offset_ns: -2147483648, imu_crc_errors: 3, imu_gaps: 0, can_errors: 4294967295, plan_crc: 2712847316, faults_logged: 65535}
+  - name: diag status one byte short
+    icd: tlm
+    message: diag_status
+    payload_hex: "8051010000030100013f000202000000800300000000000000ffffffffd4c3b2a1ff"   # 34 bytes
+    expect: reject
+  - name: diag faults with zero records
+    icd: tlm
+    message: diag_faults
+    payload_hex: "0000000000"   # 5 bytes
+    expect: decode
+    fields:
+      total: 0
+      records: []
+  - name: diag faults with one record, negative detail
+    icd: tlm
+    message: diag_faults
+    payload_hex: "090000000180ee36000102d6ffffff0700"   # 17 bytes
+    expect: decode
+    fields:
+      total: 9
+      records:
+      - {local_ms: 3600000, code: 513, detail: -42, count: 7}
+  - name: diag faults with the maximum 32 records
+    icd: tlm
+    message: diag_faults
+    payload_hex: "e803000020010000000001ffffff7f0100e9030000010190eefeff0200d10700000201e02202000300b90b00000301b0cbfcff0400a10f00000401c04504000500891300000501d0a8faff0600711700000601a06806000700591b00000701f085f8ff0800411f00000801808b080009002923000009011063f6ff0a00112700000a0160ae0a000b00f92a00000b013040f4ff0c00e12e00000c0140d10c000d00c93200000d01501df2ff0e00b13600000e0120f40e000f00993a00000f0170faefff1000813e0000100100171100110069420000110190d7edff1200514600001201e03913001300394a00001301b0b4ebff1400214e00001401c05c15001500095200001501d091e9ff1600f15500001601a07f17001700d95900001701f06ee7ff1800c15d0000180180a219001900a96100001901104ce5ff1a00916500001a0160c51b001b00796900001b013029e3ff1c00616d00001c0140e81d001d00497100001d015006e1ff1e00317500001e01200b20001f00197900001f01000000802000"   # 389 bytes
+    expect: decode
+    fields:
+      total: 1000
+      records:
+      - {local_ms: 1, code: 256, detail: 2147483647, count: 1}
+      - {local_ms: 1001, code: 257, detail: -70000, count: 2}
+      - {local_ms: 2001, code: 258, detail: 140000, count: 3}
+      - {local_ms: 3001, code: 259, detail: -210000, count: 4}
+      - {local_ms: 4001, code: 260, detail: 280000, count: 5}
+      - {local_ms: 5001, code: 261, detail: -350000, count: 6}
+      - {local_ms: 6001, code: 262, detail: 420000, count: 7}
+      - {local_ms: 7001, code: 263, detail: -490000, count: 8}
+      - {local_ms: 8001, code: 264, detail: 560000, count: 9}
+      - {local_ms: 9001, code: 265, detail: -630000, count: 10}
+      - {local_ms: 10001, code: 266, detail: 700000, count: 11}
+      - {local_ms: 11001, code: 267, detail: -770000, count: 12}
+      - {local_ms: 12001, code: 268, detail: 840000, count: 13}
+      - {local_ms: 13001, code: 269, detail: -910000, count: 14}
+      - {local_ms: 14001, code: 270, detail: 980000, count: 15}
+      - {local_ms: 15001, code: 271, detail: -1050000, count: 16}
+      - {local_ms: 16001, code: 272, detail: 1120000, count: 17}
+      - {local_ms: 17001, code: 273, detail: -1190000, count: 18}
+      - {local_ms: 18001, code: 274, detail: 1260000, count: 19}
+      - {local_ms: 19001, code: 275, detail: -1330000, count: 20}
+      - {local_ms: 20001, code: 276, detail: 1400000, count: 21}
+      - {local_ms: 21001, code: 277, detail: -1470000, count: 22}
+      - {local_ms: 22001, code: 278, detail: 1540000, count: 23}
+      - {local_ms: 23001, code: 279, detail: -1610000, count: 24}
+      - {local_ms: 24001, code: 280, detail: 1680000, count: 25}
+      - {local_ms: 25001, code: 281, detail: -1750000, count: 26}
+      - {local_ms: 26001, code: 282, detail: 1820000, count: 27}
+      - {local_ms: 27001, code: 283, detail: -1890000, count: 28}
+      - {local_ms: 28001, code: 284, detail: 1960000, count: 29}
+      - {local_ms: 29001, code: 285, detail: -2030000, count: 30}
+      - {local_ms: 30001, code: 286, detail: 2100000, count: 31}
+      - {local_ms: 31001, code: 287, detail: -2147483648, count: 32}
+  - name: diag faults with 33 records (one more than allowed)
+    icd: tlm
+    message: diag_faults
+    payload_hex: "e803000021010000000001ffffff7f0100e9030000010190eefeff0200d10700000201e02202000300b90b00000301b0cbfcff0400a10f00000401c04504000500891300000501d0a8faff0600711700000601a06806000700591b00000701f085f8ff0800411f00000801808b080009002923000009011063f6ff0a00112700000a0160ae0a000b00f92a00000b013040f4ff0c00e12e00000c0140d10c000d00c93200000d01501df2ff0e00b13600000e0120f40e000f00993a00000f0170faefff1000813e0000100100171100110069420000110190d7edff1200514600001201e03913001300394a00001301b0b4ebff1400214e00001401c05c15001500095200001501d091e9ff1600f15500001601a07f17001700d95900001701f06ee7ff1800c15d0000180180a219001900a96100001901104ce5ff1a00916500001a0160c51b001b00796900001b013029e3ff1c00616d00001c0140e81d001d00497100001d015006e1ff1e00317500001e01200b20001f00197900001f01000000802000010000000100010000000100"   # 401 bytes
+    expect: reject
+  - name: diag faults count says 1 but no record follows
+    icd: tlm
+    message: diag_faults
+    payload_hex: "0900000001"   # 5 bytes
+    expect: reject

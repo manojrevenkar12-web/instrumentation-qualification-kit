@@ -1,0 +1,4 @@
+# expect: reject PLN-04
+# Header and campaign but no channel.
+iqk-plan 1
+campaign blind1_c01

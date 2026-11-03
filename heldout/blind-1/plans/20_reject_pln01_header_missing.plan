@@ -1,0 +1,8 @@
+# expect: reject PLN-01
+# No header: the first statement is the campaign; everything else is valid.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@100
+# CAN: sum of group rates 100 Hz -> 100*135 = 13500 bit/s; total 13595 bit/s = 2.719 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 100 Hz -> 1 samples per 10 ms frame -> 1 packet(s); 9*1 + 1*(22+4+66) = 101 B/frame * 100 * 8 = 80800 bit/s (limit 2000000)
+campaign blind1_c20
+channel v1 aam:1:0 rate=100 range_mv=1000

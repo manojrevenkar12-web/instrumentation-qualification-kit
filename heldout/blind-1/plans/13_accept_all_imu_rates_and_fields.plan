@@ -1,0 +1,22 @@
+# expect: accept
+# All seven IMU fields, all four IMU rates, next to module channels at every module rate.
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 2 -> 2*95 = 190 bit/s; groups m10g0@1000, m10g1@500, m10g2@200, m10g3@100, m11g0@50, m11g1@20, m11g2@10
+# CAN: sum of group rates 1880 Hz -> 1880*135 = 253800 bit/s; total 253990 bit/s = 50.798 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 3330 Hz -> 33.3 samples per 10 ms frame -> 1 packet(s); 9*33.3 + 1*(22+4+66) = 391.7 B/frame * 100 * 8 = 313360 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel gx imu:gyro_x rate=400
+channel gy imu:gyro_y rate=200
+channel gz imu:gyro_z rate=100
+channel ax imu:accel_x rate=50
+channel ay imu:accel_y rate=400
+channel az imu:accel_z rate=200
+channel tc imu:temp rate=100
+channel r1000 aam:10:0 rate=1000 range_mv=10000
+channel r500 aam:10:3 rate=500 range_mv=10000
+channel r200 aam:10:6 rate=200 range_mv=10000
+channel r100 aam:10:9 rate=100 range_mv=10000
+channel r50 aam:11:0 rate=50 range_mv=10000
+channel r20 aam:11:3 rate=20 range_mv=10000
+channel r10 aam:11:6 rate=10 range_mv=10000

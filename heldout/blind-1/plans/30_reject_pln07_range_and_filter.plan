@@ -1,0 +1,13 @@
+# expect: reject PLN-07
+# range_mv 2000 and 50, filters lp_1khz and LP_10HZ (case differs).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 2 -> 2*95 = 190 bit/s; groups m1g0@100, m1g1@100, m1g2@100, m1g3@100, m2g0@100
+# CAN: sum of group rates 500 Hz -> 500*135 = 67500 bit/s; total 67690 bit/s = 13.538 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 500 Hz -> 5 samples per 10 ms frame -> 1 packet(s); 9*5 + 1*(22+4+66) = 137 B/frame * 100 * 8 = 109600 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel ok_1 aam:1:0 rate=100 range_mv=100 filter=lp_100hz
+channel r2000 aam:1:3 rate=100 range_mv=2000
+channel r50 aam:1:6 rate=100 range_mv=50
+channel f1k aam:1:9 rate=100 range_mv=1000 filter=lp_1khz
+channel fcase aam:2:0 rate=100 range_mv=1000 filter=LP_10HZ

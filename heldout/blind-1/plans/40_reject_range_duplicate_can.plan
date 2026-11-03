@@ -1,0 +1,22 @@
+# expect: reject PLN-07 PLN-09 PLN-11
+# One module with all four groups at 1000 Hz (108 % load), one channel with range_mv 3000, and input 5
+# used twice (both at 1000 Hz, so PLN-08 still holds).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m1g0@1000, m1g1@1000, m1g2@1000, m1g3@1000
+# CAN: sum of group rates 4000 Hz -> 4000*135 = 540000 bit/s; total 540095 bit/s = 108.019 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 13000 Hz -> 130 samples per 10 ms frame -> 3 packet(s); 9*130 + 3*(22+4+66) = 1446 B/frame * 100 * 8 = 1156800 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel c0 aam:1:0 rate=1000 range_mv=1000
+channel c1 aam:1:1 rate=1000 range_mv=1000
+channel c2 aam:1:2 rate=1000 range_mv=3000
+channel c3 aam:1:3 rate=1000 range_mv=1000
+channel c4 aam:1:4 rate=1000 range_mv=1000
+channel c5 aam:1:5 rate=1000 range_mv=1000
+channel c6 aam:1:6 rate=1000 range_mv=1000
+channel c7 aam:1:7 rate=1000 range_mv=1000
+channel c8 aam:1:8 rate=1000 range_mv=1000
+channel c9 aam:1:9 rate=1000 range_mv=1000
+channel c10 aam:1:10 rate=1000 range_mv=1000
+channel c11 aam:1:11 rate=1000 range_mv=1000
+channel c5_again aam:1:5 rate=1000 range_mv=1000

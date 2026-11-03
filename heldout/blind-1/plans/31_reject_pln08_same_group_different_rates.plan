@@ -1,0 +1,13 @@
+# expect: reject PLN-08
+# Module 3 inputs 0 and 2 (group 0) at 100 and 50 Hz. Inputs 5 and 6 (groups 1 and 2) differ, which is
+# allowed. Group 0's rate is not defined by the documents; CAN load is small either way (worst case 100 Hz used below).
+# CAN: heartbeat 4 B = 8*4+47+floor(65/4)=95 bit; data 8 B = 8*8+47+floor(97/4)=135 bit
+# CAN: modules used 1 -> 1*95 = 95 bit/s; groups m3g0@100, m3g1@20, m3g2@10
+# CAN: sum of group rates 130 Hz -> 130*135 = 17550 bit/s; total 17645 bit/s = 3.529 % of 500 kbit/s (limit 300000)
+# TLM: total sample rate 180 Hz -> 1.8 samples per 10 ms frame -> 1 packet(s); 9*1.8 + 1*(22+4+66) = 108.2 B/frame * 100 * 8 = 86560 bit/s (limit 2000000)
+iqk-plan 1
+campaign blind1_c01
+channel a aam:3:0 rate=100 range_mv=1000
+channel b aam:3:2 rate=50 range_mv=1000
+channel c aam:3:5 rate=20 range_mv=1000
+channel d aam:3:6 rate=10 range_mv=1000
