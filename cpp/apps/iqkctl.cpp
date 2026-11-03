@@ -183,8 +183,11 @@ int replay(const std::string& path) {
     } else if (port == 0xFD) {
       std::vector<iqk::plan::Finding> f;
       (void)dau.load_plan(std::string_view{reinterpret_cast<const char*>(b.data()), b.size()}, t, f);
-    } else {
+    } else if (port <= static_cast<std::uint8_t>(iqk::Port::tlm)) {
       dau.on_input(static_cast<iqk::Port>(port), b, t, tx);
+    } else {
+      std::cerr << "unknown record type " << int{port} << "\n";
+      return 1;
     }
   }
   const auto digest = iqk::update::sha256(stream);

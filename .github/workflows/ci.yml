@@ -118,5 +118,7 @@ jobs:
       - run: npx biome ci src e2e
       - run: npx tsc --noEmit -p .
       - run: npx vitest run
+      - name: Build the console with the committed evidence
+        run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test

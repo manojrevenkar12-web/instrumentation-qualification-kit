@@ -21,7 +21,7 @@ set(IQK_HARDENING -fstack-protector-strong -fstack-clash-protection -D_FORTIFY_S
 set(IQK_LINK_HARDENING -pie -Wl,-z,relro,-z,now -Wl,-z,noexecstack)
 
 # Reproducibility: no build paths or dates in the binaries; the same sources and toolchain give the same bytes.
-set(IQK_REPRO -ffile-prefix-map=${CMAKE_SOURCE_DIR}=. -fdebug-prefix-map=${CMAKE_SOURCE_DIR}=. -Wdate-time)
+set(IQK_REPRO -ffile-prefix-map=${CMAKE_SOURCE_DIR}=. -ffile-prefix-map=${CMAKE_BINARY_DIR}=build -Wdate-time)
 set(IQK_REPRO_LINK -Wl,--build-id=sha1)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

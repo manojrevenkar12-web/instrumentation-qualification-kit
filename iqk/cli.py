@@ -151,10 +151,12 @@ def main(argv: list[str] | None = None) -> int:
         from .bench import Bench, Fault
 
         faults = []
-        for f in args.fault:
-            name, _, span = f.partition("@")
+        for f in args.fault:  # name@from-to:key=value,key=value
+            spec, _, params = f.partition(":")
+            name, _, span = spec.partition("@")
             lo, _, hi = span.partition("-")
-            faults.append(Fault(name, float(lo or 0), float(hi or 1e9)))
+            kv = {k: float(v) for k, v in (x.split("=") for x in params.split(",") if x)}
+            faults.append(Fault(name, float(lo or 0), float(hi or 1e9), kv))
         r = Bench(ROOT / "work" / "bench", Path(args.plan).read_text(), faults, seed=args.seed).run(args.seconds)
         if args.report:
             from .report import bench_summary
