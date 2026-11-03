@@ -126,20 +126,24 @@ void TimeSync::measurement(Source s, std::int64_t local_ns, std::int64_t master_
   const std::int64_t dt = (last_meas_local_ == INT64_MIN || local_ns <= last_meas_local_)
                               ? kNsPerS
                               : std::max<std::int64_t>(local_ns - last_meas_local_, 10'000'000);
+  const bool ptp = s == Source::ptp;
+  const double kp = ptp ? cfg::ptp_kp : cfg::gnss_kp;
+  const double ki = ptp ? cfg::ptp_ki : cfg::gnss_ki;
+  const std::int64_t lock_threshold = ptp ? cfg::ptp_lock_threshold_ns : cfg::gnss_lock_threshold_ns;
+  const std::int64_t unlock_threshold = ptp ? cfg::ptp_unlock_threshold_ns : cfg::gnss_unlock_threshold_ns;
   const double limit = static_cast<double>(cfg::max_freq_adj_ppb) * 1e-9;
-  drift_ = std::clamp(drift_ + cfg::servo_ki * static_cast<double>(offset) / static_cast<double>(dt), -limit, limit);
-  const double rate =
-      std::clamp(drift_ + cfg::servo_kp * static_cast<double>(offset) / static_cast<double>(dt), -limit, limit);
+  drift_ = std::clamp(drift_ + ki * static_cast<double>(offset) / static_cast<double>(dt), -limit, limit);
+  const double rate = std::clamp(drift_ + kp * static_cast<double>(offset) / static_cast<double>(dt), -limit, limit);
   clock_.set_rate(local_ns, rate);
   last_meas_local_ = local_ns;
 
   const std::int64_t a = std::llabs(offset);
-  if (a < cfg::lock_threshold_ns) {
+  if (a < lock_threshold) {
     ++in_threshold_;
   } else {
     in_threshold_ = 0;
   }
-  if (state_ == State::locked && a > cfg::unlock_threshold_ns) {
+  if (state_ == State::locked && a > unlock_threshold) {
     state_ = State::locking;
     emit(Event::Kind::lost_lock, local_ns, offset);
   }

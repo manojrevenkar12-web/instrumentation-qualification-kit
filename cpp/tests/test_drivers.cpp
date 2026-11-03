@@ -169,4 +169,7 @@ TEST(Aam, BadFramesAreCountedNotUsed) {
   d.on_frame(iqk_test::data_frame(1, 7, 0, 0, 0, 0), kS, log, [&](const iqk::AamReading&) { ++readings; });  // mux 7
   EXPECT_EQ(readings, 0);
   EXPECT_EQ(d.errors(), 1U);
+  d.on_frame(iqk_test::heartbeat(1, 9), kS, log, [&](const iqk::AamReading&) { ++readings; });  // no state 9
+  EXPECT_EQ(d.errors(), 2U);
+  EXPECT_FALSE(d.alive(1, kS));
 }

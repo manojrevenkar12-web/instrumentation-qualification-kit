@@ -133,7 +133,10 @@ class ImuEmulator(Emulator):
             delay = target - time.monotonic()
             if delay > 0:
                 time.sleep(delay)
-            if not self.streaming or self.fault("imu_silent"):
+            if not self.streaming:
+                continue
+            if self.fault("imu_silent"):  # samples are still taken, but none reach the unit
+                self.seq = (self.seq + 1) & 0xFFFF
                 continue
             true_t = self.bench.truth.now()
             dev_us = int((time.monotonic_ns() * (1 + self.drift_ppm * 1e-6)) // 1000) & 0xFFFFFFFF
@@ -220,7 +223,11 @@ class GnssEmulator(Emulator):
         while not self.stop_flag.is_set():
             now = self.bench.truth.now()
             next_s = (now // 1_000_000_000 + 1) * 1_000_000_000
-            time.sleep(max(0.0, (next_s - now) / 1e9))
+            # Sleep to just before the second, then spin: a PPS edge emulated with a plain sleep would be late
+            # by the scheduler's wake-up latency, which is the emulator's error, not the unit's.
+            time.sleep(max(0.0, (next_s - now) / 1e9 - 0.003))
+            while self.bench.truth.now() < next_s:
+                pass
             if self.stop_flag.is_set():
                 return
             if self.fault("gnss_outage"):
@@ -269,6 +276,7 @@ class AamEmulator(Emulator):
         self.hb_counter = {node: 0 for node in nodes}
         self.requests = 0
         self.timecode: list[tuple[int, int]] = []  # (true time of sample, raw)
+        self.sent: dict[tuple[int, int], int] = {}  # (node, group) -> data frames sent
 
     def send(self, can_id: int, payload: bytes) -> None:
         pkt = struct.pack("<IB", can_id, len(payload)) + payload.ljust(8, b"\x00")
@@ -390,6 +398,7 @@ class AamEmulator(Emulator):
                         continue
                     d = {"mux": g, "counter": self.counters[node][g], "ch_a": raws[0], "ch_b": raws[1], "ch_c": raws[2]}
                     self.send(0x180 + node, I.encode(AAM, AAM.message("aam_data"), d))
+                    self.sent[(node, g)] = self.sent.get((node, g), 0) + 1
 
 
 class PtpMaster(Emulator):
@@ -531,6 +540,7 @@ class Result:
     recording: Path
     timecode_errors_us: list[float]
     imu_sent: int
+    aam_sent: dict
     aam_requests: int
     ptp_exchanges: int
     crc_errors: int
@@ -593,6 +603,7 @@ class Bench:
             recording=recording,
             timecode_errors_us=timecode_errors(rec.packets, plan_channel_index(self.plan, "aam:1:0")),
             imu_sent=imu.sent,
+            aam_sent=dict(aam.sent),
             aam_requests=aam.requests,
             ptp_exchanges=ptp.exchanges,
             crc_errors=rec.crc_errors,

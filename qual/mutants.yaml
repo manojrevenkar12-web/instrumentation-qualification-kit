@@ -1,0 +1,131 @@
+# Mutants: for each requirement, the plausible ways to violate it in the code. A test that claims to verify a
+# requirement is accepted as evidence only if it fails on that requirement's mutants (`iqk qual prove`).
+#
+# Each mutant replaces `find` (which must occur exactly once in `file`, or once after the text `after`) with
+# `replace`. A mutant that does not compile is reported as stillborn and must be fixed, not counted.
+SRS-001:
+  - {name: imu_time_big_endian, file: cpp/gen/iqk/icd/imu.hpp, find: "wire::put(out, off, wire::to_raw(m.t_us), 4, wire::Order::little);", replace: "wire::put(out, off, wire::to_raw(m.t_us), 4, wire::Order::big);"}
+  - {name: ptp_seq_little_endian, file: cpp/gen/iqk/icd/ptp.hpp, after: "encode(const PtpFollowUp& m", find: "wire::put(out, off, wire::to_raw(m.sequence_id), 2, wire::Order::big);", replace: "wire::put(out, off, wire::to_raw(m.sequence_id), 2, wire::Order::little);"}
+SRS-002:
+  - {name: short_imu_accepted, file: cpp/gen/iqk/icd/imu.hpp, find: "if (in.size() != ImuSample::kSize) { return false; }", replace: "if (in.size() < ImuSample::kSize) { return false; }"}
+  - {name: array_count_unchecked, file: cpp/gen/iqk/icd/tlm.hpp, find: "if (m.samples_count > TlmPacket::kMaxRecords ||", replace: "if (m.samples_count > 255 ||"}
+SRS-003:
+  - {name: imu_range_unchecked, file: cpp/include/iqk/drivers.hpp, find: "if (!icd::imu::in_range(out.s)) {", replace: "if (false) {"}
+  - {name: heartbeat_state_unchecked, file: cpp/include/iqk/drivers.hpp, find: "if (!icd::aam::decode(f.payload(), hb) || !icd::aam::in_range(hb)) {", replace: "if (!icd::aam::decode(f.payload(), hb)) {"}
+SRS-010:
+  - {name: buffer_reset_per_read, file: cpp/include/iqk/framing.hpp, find: "    for (const std::uint8_t b : bytes) {", replace: "    n_ = 0;\n    for (const std::uint8_t b : bytes) {"}
+  - {name: split_sync_lost, file: cpp/src/framing.cpp, find: "if (i + 1 >= n_ && !(n_ > 0 && buf_[n_ - 1] == kSync0)) {", replace: "if (i + 1 >= n_) {"}
+SRS-011:
+  - {name: drop_whole_frame_on_crc_error, file: cpp/src/framing.cpp, after: "++stats_.crc_errors;", find: "drop(1);", replace: "drop(total);"}
+SRS-012:
+  - {name: crc_errors_not_counted, file: cpp/src/framing.cpp, find: "      ++stats_.crc_errors;\n", replace: ""}
+SRS-013:
+  - {name: impossible_length_waited_for, file: cpp/src/framing.cpp, find: "if (len > max_len_) {", replace: "if (len > max_len_ + 230) {"}
+SRS-020:
+  - {name: arrival_time_stamps, file: cpp/src/drivers.cpp, find: "return dev_ns_ + min_offset_;", replace: "return rx_local;"}
+SRS-021:
+  - {name: gap_without_wrap, file: cpp/include/iqk/drivers.hpp, find: "const auto step = static_cast<std::uint16_t>(out.s.seq - last_seq_);", replace: "const auto step = static_cast<std::uint16_t>(out.s.seq >= last_seq_ ? out.s.seq - last_seq_ : last_seq_ - out.s.seq);"}
+  - {name: gap_threshold_ignored, file: cpp/include/iqk/drivers.hpp, find: "if (missing > static_cast<std::uint64_t>(cfg::imu::max_gap_samples) || step == 0U) {", replace: "if (missing > 100U || step == 0U) {"}
+SRS-022:
+  - {name: device_time_not_unwrapped, file: cpp/src/drivers.cpp, find: "    dev_ns_ += static_cast<std::int64_t>(static_cast<std::uint32_t>(t_us - last_tus_)) * 1000;  // wraps at 2^32 us", replace: "    dev_ns_ = static_cast<std::int64_t>(t_us) * 1000;"}
+SRS-023:
+  - {name: self_test_ignored, file: cpp/include/iqk/drivers.hpp, find: "return bit_result_ == 0; }", replace: "return true; }"}
+  - {name: start_before_self_test, file: cpp/src/dau.cpp, find: "for (const std::uint8_t cmd : {kImuSelfTest, kImuStart}) {", replace: "for (const std::uint8_t cmd : {kImuStart, kImuSelfTest}) {"}
+SRS-030:
+  - {name: heartbeat_timeout_ten_times, file: cpp/src/drivers.cpp, find: "if (now - n.last_hb > cfg::aam::heartbeat_timeout_ms * 1'000'000) {", replace: "if (now - n.last_hb > cfg::aam::heartbeat_timeout_ms * 10'000'000) {"}
+  - {name: loss_logged_repeatedly, file: cpp/src/drivers.cpp, find: "      n.lost_logged = true;\n", replace: ""}
+SRS-031:
+  - {name: one_counter_per_module, file: cpp/include/iqk/drivers.hpp, find: "auto& g = n.groups[d.mux];", replace: "auto& g = n.groups[0];"}
+SRS-032:
+  - {name: overrange_off_by_one, file: cpp/src/dau.cpp, find: "std::abs(static_cast<int>(raw)) >= cfg::aam::overrange_raw;", replace: "std::abs(static_cast<int>(raw)) > cfg::aam::overrange_raw;"}
+  - {name: millivolts_scaled_wrong, file: cpp/src/dau.cpp, find: "static_cast<double>(c.range_mv) / 1000.0;", replace: "static_cast<double>(c.range_mv) / 100.0;"}
+SRS-040:
+  - {name: duplicate_keys_accepted, file: cpp/src/plan.cpp, find: "if (!seen.insert(k).second) {", replace: "if (false) {"}
+  - {name: unknown_key_noted_not_refused, file: cpp/src/plan.cpp, after: "for this source\");", find: "        line_ok = false;\n", replace: ""}
+SRS-041:
+  - {name: duplicate_names_accepted, file: cpp/src/plan.cpp, find: "if (!names.insert(c.name).second) {", replace: "if (false) {"}
+SRS-042:
+  - {name: input_bound_off_by_one, file: cpp/src/plan.cpp, find: "c.input >= aam::kChannels) {", replace: "c.input > aam::kChannels) {"}
+SRS-043:
+  - {name: module_rate_unchecked, file: cpp/src/plan.cpp, find: "if (divisor_for(c.rate_hz) < 0) {", replace: "if (divisor_for(c.rate_hz) < -1) {"}
+  - {name: fractional_imu_rate_truncated, file: cpp/src/plan.cpp, find: " ||\n          c.rate_hz != std::floor(c.rate_hz)) {", replace: ") {"}
+SRS-044:
+  - {name: range_unchecked, file: cpp/src/plan.cpp, find: "if (range_code(c.range_mv) < 0) {", replace: "if (false) {"}
+SRS-045:
+  - {name: wrong_group_size, file: cpp/src/plan.cpp, find: "const auto key = std::pair{c.node, c.input / 3};", replace: "const auto key = std::pair{c.node, c.input / 4};"}
+SRS-046:
+  - {name: inputs_reusable, file: cpp/src/plan.cpp, find: "if (!inputs.insert({c.node, c.input, \"\"}).second) {", replace: "if (false) {"}
+SRS-047:
+  - {name: high_alarm_unchecked, file: cpp/src/plan.cpp, find: "} else if (lo < mlo || hi > mhi) {", replace: "} else if (lo < mlo) {"}
+  - {name: negative_scale_not_ordered, file: cpp/src/plan.cpp, find: "return {std::min(a, b), std::max(a, b)};", replace: "return {a, b};"}
+SRS-048:
+  - {name: no_bit_stuffing, file: cpp/include/iqk/plan.hpp, find: "return 8 * n + 47 + (34 + 8 * n - 1) / 4; }", replace: "return 8 * n + 47; }"}
+  - {name: bus_limit_ignored, file: cpp/src/plan.cpp, find: "load > pcfg::max_can_bus_load) {", replace: "load > 1.0) {"}
+SRS-049:
+  - {name: overhead_ignored, file: cpp/src/plan.cpp, find: "const double packet_overhead = static_cast<double>(tlm::TlmPacket::kFixedSize) + 4.0 + kUdpIpEth;", replace: "const double packet_overhead = 0.0;"}
+SRS-050:
+  - {name: no_retries, file: cpp/src/loader.cpp, find: "if (attempts_ > cfg::plan::reg_retries) {", replace: "if (attempts_ > 0) {"}
+  - {name: one_retry_too_many, file: cpp/src/loader.cpp, find: "if (attempts_ > cfg::plan::reg_retries) {", replace: "if (attempts_ > cfg::plan::reg_retries + 1) {"}
+SRS-051:
+  - {name: abort_ignored, file: cpp/src/loader.cpp, find: "  if (r.cmd == kAbort) {\n    fail(Failure::abort, r.value);\n    return;\n  }\n", replace: ""}
+SRS-052:
+  - {name: readback_not_compared, file: cpp/src/loader.cpp, find: "if (!op.write && r.value != op.expect) {", replace: "if (!op.write && r.value != op.expect && op.r.index == aam::kRegConfigCrcIndex) {"}
+  - {name: only_enabled_inputs_written, file: cpp/src/plan.cpp, find: "      out.push_back({node, idx, aam::kRegChEnableSub, ins[i].enable});", replace: "      if (ins[i].enable == 0U) {\n        continue;\n      }\n      out.push_back({node, idx, aam::kRegChEnableSub, ins[i].enable});"}
+SRS-053:
+  - {name: module_crc_not_read, file: cpp/src/loader.cpp, find: "    ops_.push_back({false, {n, aam::kRegConfigCrcIndex, aam::kRegConfigCrcSub, 0U}, plan::expected_module_crc(p, n)});", replace: "    (void)n;"}
+SRS-054:
+  - {name: armed_without_verification, file: cpp/src/dau.cpp, find: "} else if (loader_.status() == PlanLoader::Status::done && !armed_ && plan_) {", replace: "} else if (!armed_ && plan_) {"}
+  - {name: plan_crc_not_sent, file: cpp/src/dau.cpp, find: "pk.plan_crc = plan_crc_;", replace: "pk.plan_crc = 0;"}
+SRS-055:
+  - {name: answer_not_matched, file: cpp/src/loader.cpp, find: "if (!aam::decode(f.payload(), r) || r.index != op.r.index || r.sub != op.r.sub) {", replace: "if (!aam::decode(f.payload(), r)) {"}
+SRS-060:
+  - {name: requester_not_checked, file: cpp/src/timesync.cpp, find: "        m.req_clock_identity != id_ || t3_ == INT64_MIN || !have_t1_) {", replace: "        t3_ == INT64_MIN || !have_t1_) {"}
+  - {name: delay_formula_sign, file: cpp/src/timesync.cpp, find: "const std::int64_t delay = ((t2 - t1) + (t4 - t3)) / 2;", replace: "const std::int64_t delay = ((t2 - t1) - (t4 - t3)) / 2;"}
+SRS-061:
+  - {name: no_outlier_filter, file: cpp/src/timesync.cpp, find: "if (delay < 0 || (min_delay != INT64_MAX && delay > cfg::ptp_outlier_factor * floor)) {", replace: "if (delay < 0) {"}
+SRS-062:
+  - {name: edge_reused, file: cpp/src/timesync.cpp, find: "  pps_edge_.reset();  // each edge is used once\n", replace: ""}
+  - {name: accuracy_limit_loose, file: cpp/src/timesync.cpp, find: "} else if (m.acc_ns > static_cast<std::uint32_t>(cfg::gnss_max_acc_ns)) {", replace: "} else if (m.acc_ns > static_cast<std::uint32_t>(cfg::gnss_max_acc_ns * 10)) {"}
+SRS-063:
+  - {name: steps_small_offsets, file: cpp/src/timesync.cpp, find: "if (std::llabs(offset) > kStepThresholdNs) {", replace: "if (std::llabs(offset) > 1000) {"}
+SRS-064:
+  - {name: lock_one_early, file: cpp/src/timesync.cpp, find: "in_threshold_ >= cfg::lock_count) {", replace: "in_threshold_ >= cfg::lock_count - 1) {"}
+  - {name: unlock_threshold_loose, file: cpp/src/timesync.cpp, find: "if (state_ == State::locked && a > unlock_threshold) {", replace: "if (state_ == State::locked && a > unlock_threshold * 4) {"}
+SRS-065:
+  - {name: no_holdover, file: cpp/src/timesync.cpp, find: "if (!live && (state_ == State::locked || state_ == State::locking) && clock_.valid()) {", replace: "if (!live && state_ == State::free_running && clock_.valid()) {"}
+  - {name: holdover_too_long, file: cpp/src/timesync.cpp, find: "local_ns - holdover_since_ > cfg::holdover_max_ms * 1'000'000) {", replace: "local_ns - holdover_since_ > cfg::holdover_max_ms * 10'000'000) {"}
+SRS-066:
+  - {name: no_switch_hold, file: cpp/src/timesync.cpp, find: "if (local_ns - h.good_since_ns < cfg::switch_hold_ms * 1'000'000) {", replace: "if (local_ns - h.good_since_ns < 0) {"}
+SRS-070:
+  - {name: crc_short, file: cpp/src/dau.cpp, find: "crc::crc32(std::span<const std::uint8_t>{buf_.data(), len});", replace: "crc::crc32(std::span<const std::uint8_t>{buf_.data(), len - 1});"}
+  - {name: sequence_skips, file: cpp/src/dau.cpp, find: "pk.seq = tlm_seq_++;", replace: "pk.seq = (tlm_seq_ += 2);"}
+SRS-071:
+  - {name: not_sorted, file: cpp/src/dau.cpp, find: "  std::stable_sort(frame_.begin(), frame_.end(), [](const Sample& a, const Sample& b) { return a.local_ns < b.local_ns; });\n", replace: ""}
+SRS-072:
+  - {name: high_alarm_flagged_low, file: cpp/src/dau.cpp, find: "      flags |= 8U;", replace: "      flags |= 4U;"}
+SRS-073:
+  - {name: no_decimation, file: cpp/src/dau.cpp, find: "o.decimate = static_cast<int>(std::lround(icd::imu::ImuSample::kRateHz / c.rate_hz));", replace: "o.decimate = 1;"}
+SRS-080:
+  - {name: status_without_plan_crc, file: cpp/src/dau.cpp, find: "s.plan_crc = plan_crc();", replace: "s.plan_crc = 0;"}
+SRS-081:
+  - {name: no_folding, file: cpp/include/iqk/faultlog.hpp, find: "if (r.code == code) {", replace: "if (false && r.code == code) {"}
+  - {name: overwrites_not_counted, file: cpp/include/iqk/faultlog.hpp, find: "      ++overwritten_;\n", replace: ""}
+SRS-082:
+  - {name: request_range_unchecked, file: cpp/src/dau.cpp, find: "if (!tlm::decode(req, r) || !tlm::in_range(r)) {", replace: "if (!tlm::decode(req, r)) {"}
+SRS-090:
+  - {name: signature_not_checked, file: cpp/src/update.cpp, find: "if (!ed25519_verify(anchor, pkg.first(kHeaderSize), pkg.subspan(kHeaderSize, kSignatureSize))) {", replace: "if (false) {"}
+  - {name: hash_not_checked, file: cpp/src/update.cpp, find: "if (sha256(pkg.subspan(kPrefixSize)) != h.sha256) {", replace: "if (false) {"}
+SRS-091:
+  - {name: hardware_not_checked, file: cpp/src/update.cpp, find: "if (h.hw_id != hw_id) {", replace: "if (false) {"}
+SRS-092:
+  - {name: floor_off_by_one, file: cpp/src/update.cpp, find: "if (h.security_version < security_floor) {", replace: "if (h.security_version + 1 < security_floor) {"}
+  - {name: floor_never_raised, file: cpp/src/update.cpp, find: "  s.security_floor = std::max(s.security_floor, h.security_version);\n", replace: ""}
+SRS-093:
+  - {name: writes_active_slot, file: cpp/src/update.cpp, find: "const std::uint8_t target = static_cast<std::uint8_t>(1U - s.active);", replace: "const std::uint8_t target = s.active;"}
+SRS-094:
+  - {name: unlimited_trials, file: cpp/src/update.cpp, find: "s.trial_boots < cfg::update::max_trial_boots) {", replace: "s.trial_boots < 100) {"}
+SRS-095:
+  - {name: pending_not_verified, file: cpp/src/update.cpp, find: "if (v == Verdict::ok && s.trial_boots", replace: "if (s.trial_boots"}
+  - {name: active_not_verified, file: cpp/src/update.cpp, find: "  if (va == Verdict::ok) {\n    return {Boot::active, s.active, Verdict::ok};", replace: "  if (true) {\n    return {Boot::active, s.active, Verdict::ok};"}
+SRS-096:
+  - {name: state_crc_not_checked, file: cpp/src/update.cpp, find: "if (b.size() != 12 || wire::get(b, 8, 4, wire::Order::little) != crc::crc32(std::span{b}.first(8))) {", replace: "if (b.size() != 12) {"}

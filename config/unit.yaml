@@ -7,14 +7,20 @@ unit:
 
 timing:
   sources: [ptp, gnss]         # priority order
-  lock_threshold_ns: 100000    # |offset| below this counts towards lock (software time stamps; 1 us with hardware stamping)
-  lock_count: 8                # consecutive measurements inside the threshold to declare lock
-  unlock_threshold_ns: 500000  # one measurement beyond this drops lock (offsets above 1 ms are stepped)
+  # Per source: PTP at 8 Hz, GNSS once a second. Thresholds are for software time stamps (the PPS edge on this
+  # bench is a datagram); with hardware stamping both would be about 1 us.
+  ptp_lock_threshold_ns: 100000    # |offset| below this counts towards lock
+  gnss_lock_threshold_ns: 400000
+  ptp_unlock_threshold_ns: 500000  # one measurement beyond this drops lock (offsets above 1 ms are stepped)
+  gnss_unlock_threshold_ns: 900000
+  lock_count: 8                    # consecutive measurements inside the threshold to declare lock
   holdover_start_ms: 2500      # no valid measurement for this long: holdover
   holdover_max_ms: 300000      # holdover longer than this: free-running (quality 0)
   max_freq_adj_ppb: 200000     # servo output clamp
-  servo_kp: 0.7
-  servo_ki: 0.3
+  ptp_kp: 0.7                      # PI servo gains per source; GNSS is slower and noisier, so softer
+  ptp_ki: 0.3
+  gnss_kp: 0.3
+  gnss_ki: 0.05
   ptp_outlier_factor: 4        # a path delay more than this times the running minimum is discarded
   ptp_min_window: 16           # measurements in the running-minimum window
   gnss_max_acc_ns: 200         # time pulses less accurate than this are not used

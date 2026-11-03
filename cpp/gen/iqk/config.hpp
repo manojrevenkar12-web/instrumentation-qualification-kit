@@ -14,14 +14,18 @@ inline constexpr std::int64_t hw_id = 259063809;
 
 namespace timing {
 inline constexpr std::array<std::string_view, 2> sources{"ptp", "gnss"};
-inline constexpr std::int64_t lock_threshold_ns = 100000;
+inline constexpr std::int64_t ptp_lock_threshold_ns = 100000;
+inline constexpr std::int64_t gnss_lock_threshold_ns = 400000;
+inline constexpr std::int64_t ptp_unlock_threshold_ns = 500000;
+inline constexpr std::int64_t gnss_unlock_threshold_ns = 900000;
 inline constexpr std::int64_t lock_count = 8;
-inline constexpr std::int64_t unlock_threshold_ns = 500000;
 inline constexpr std::int64_t holdover_start_ms = 2500;
 inline constexpr std::int64_t holdover_max_ms = 300000;
 inline constexpr std::int64_t max_freq_adj_ppb = 200000;
-inline constexpr double servo_kp = 0.7;
-inline constexpr double servo_ki = 0.3;
+inline constexpr double ptp_kp = 0.7;
+inline constexpr double ptp_ki = 0.3;
+inline constexpr double gnss_kp = 0.3;
+inline constexpr double gnss_ki = 0.05;
 inline constexpr std::int64_t ptp_outlier_factor = 4;
 inline constexpr std::int64_t ptp_min_window = 16;
 inline constexpr std::int64_t gnss_max_acc_ns = 200;

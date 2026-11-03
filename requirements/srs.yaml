@@ -173,9 +173,9 @@ requirements:
   # --- time ------------------------------------------------------------------------------------------------
   - id: SRS-060
     title: PTP exchange
-    text: Offset and path delay are computed from the two-step end-to-end exchange; Follow_Up and Delay_Resp are matched by sequence id and requester identity; other domains and versions are ignored.
+    text: Offset and path delay are computed from the two-step end-to-end exchange; Follow_Up and Delay_Resp are matched by sequence id and requester identity; other domains and versions are ignored. The PTP servo removes a constant oscillator error.
     method: test
-    cites: [icd/ptp.yaml]
+    cites: [icd/ptp.yaml, config/unit.yaml#timing.ptp_kp, config/unit.yaml#timing.ptp_ki]
   - id: SRS-061
     title: Delay outliers
     text: An exchange whose path delay exceeds timing.ptp_outlier_factor times the running minimum does not adjust the clock.
@@ -193,9 +193,9 @@ requirements:
     cites: []
   - id: SRS-064
     title: Lock
-    text: Lock is declared after timing.lock_count consecutive measurements within timing.lock_threshold_ns and lost on one beyond timing.unlock_threshold_ns.
+    text: Lock is declared after timing.lock_count consecutive measurements within the active source's lock threshold and lost on one beyond its unlock threshold.
     method: test
-    cites: [config/unit.yaml#timing.lock_count, config/unit.yaml#timing.lock_threshold_ns, config/unit.yaml#timing.unlock_threshold_ns]
+    cites: [config/unit.yaml#timing.lock_count, config/unit.yaml#timing.ptp_lock_threshold_ns, config/unit.yaml#timing.ptp_unlock_threshold_ns, config/unit.yaml#timing.gnss_lock_threshold_ns, config/unit.yaml#timing.gnss_unlock_threshold_ns]
   - id: SRS-065
     title: Holdover and free-running
     text: Without measurements for timing.holdover_start_ms the unit enters holdover at the learned rate (quality 1); after timing.holdover_max_ms it is free-running (quality 0).
