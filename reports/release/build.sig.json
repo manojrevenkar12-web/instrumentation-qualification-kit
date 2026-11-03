@@ -1,0 +1,7 @@
+{
+ "role": "build",
+ "key": "ephemeral pipeline key (no long-lived secret in CI)",
+ "public_key": "88afe4f428072fcc1e5ef943912e430422c16a724300f47517698ac2d1354822",
+ "signature": "4766372c0b645d42dd73c650f293d2cd06bfb566327f1c07e8a2e47341ec73ae8c34886a3a49fa0fd7e4714bbb0df1e390af2257152b0708807a6bb0e74c5a01",
+ "manifest_sha256": "985297461cc7282dde02cdfcec43b1bb5d2349efa142b1c1d0a38b56ef5463bb"
+}

@@ -1,11 +1,9 @@
 {
- "pass": false,
- "clang_tidy_findings": 1,
+ "pass": true,
+ "clang_tidy_findings": 0,
  "cppcheck_findings": 0,
  "details": {
-  "clang_tidy": [
-   "/home/claude/instrumentation-qualification-kit/cpp/apps/iqkctl.cpp:187:20: error: The value '252' provided to the cast expression is not in the valid range of values for 'Port' [clang-analyzer-optin.core.EnumCastOutOfRange,-warnings-as-errors]"
-  ],
+  "clang_tidy": [],
   "cppcheck": []
  }
 }

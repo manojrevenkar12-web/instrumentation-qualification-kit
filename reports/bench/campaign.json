@@ -1,0 +1,99 @@
+{
+ "name": "campaign",
+ "seconds": 24.8,
+ "faults_injected": [
+  {
+   "name": "imu_bit_errors",
+   "from_s": 4.0,
+   "to_s": 8.0
+  },
+  {
+   "name": "imu_garbage",
+   "from_s": 4.0,
+   "to_s": 8.0
+  },
+  {
+   "name": "imu_drop",
+   "from_s": 8.0,
+   "to_s": 10.0
+  },
+  {
+   "name": "imu_silent",
+   "from_s": 10.0,
+   "to_s": 10.2
+  },
+  {
+   "name": "imu_out_of_range",
+   "from_s": 4.0,
+   "to_s": 12.0
+  },
+  {
+   "name": "aam_silent",
+   "from_s": 6.0,
+   "to_s": 12.0
+  },
+  {
+   "name": "ptp_jitter",
+   "from_s": 2.0,
+   "to_s": 20.0
+  },
+  {
+   "name": "ptp_outage",
+   "from_s": 12.0,
+   "to_s": 17.0
+  }
+ ],
+ "packets": 1910,
+ "samples": 72358,
+ "crc_errors_at_receiver": 0,
+ "time_source": 2,
+ "time_state": 2,
+ "time_error_us": {
+  "n": 10824,
+  "p50": 93.8,
+  "p95": 456.4,
+  "p99": 616.4,
+  "max": 8365.9
+ },
+ "time_error_histogram": {
+  "edges_us": [
+   0,
+   50,
+   100,
+   200,
+   300,
+   500,
+   750,
+   1000,
+   2000,
+   5000
+  ],
+  "counts": [
+   1845,
+   4041,
+   3141,
+   575,
+   839,
+   306,
+   25,
+   27,
+   22,
+   3
+  ]
+ },
+ "time_quality": {
+  "0": 805,
+  "3": 1105
+ },
+ "faults_logged": {
+  "IMU gap": 1,
+  "IMU CRC error": 104,
+  "IMU out of range": 15,
+  "IMU lost": 1,
+  "Module lost": 1,
+  "Clock stepped": 3,
+  "Time source switched": 3,
+  "PTP outlier": 13
+ },
+ "imu_crc_errors": 104
+}

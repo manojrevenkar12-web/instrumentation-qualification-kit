@@ -1,0 +1,2419 @@
+{
+ "generated_at": "2026-11-03T10:47:28+00:00",
+ "summary": {
+  "requirements": 58,
+  "by_status": {
+   "verified": 55,
+   "verified, system level (no mutants)": 3
+  },
+  "tests": 97,
+  "tests_passed": 97,
+  "links": 113,
+  "links_proven": 71,
+  "links_unproven": 18,
+  "links_system": 24,
+  "mutants": 76,
+  "mutants_caught_by_linked_tests": 76,
+  "mutants_caught_only_by_unlinked_tests": 0,
+  "orphan_claims": [],
+  "generated_drift": [],
+  "gate": {
+   "all_requirements_verified": true,
+   "no_failing_tests": true,
+   "every_mutant_caught": true,
+   "no_claims_on_unknown_requirements": true,
+   "generated_files_current": true,
+   "pass": true
+  }
+ },
+ "requirements": [
+  {
+   "id": "SRS-001",
+   "title": "Wire formats follow the ICDs",
+   "text": "Every message is encoded and decoded with the field order, sizes and byte order of its ICD.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml",
+    "icd/aam.yaml",
+    "icd/gnss.yaml",
+    "icd/ptp.yaml",
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Crc.CheckValues",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Codec.ImuSampleLayoutIsLittleEndianAsInTheIcd",
+     "passed": true,
+     "kills": [
+      "imu_time_big_endian"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Codec.PtpIsBigEndianWith48BitSeconds",
+     "passed": true,
+     "kills": [
+      "ptp_seq_little_endian"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Codec.TelemetryPacketRoundTripsWithItsRecords",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "pytest:tests/unit/test_icd.py::test_generated_files_are_current",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    },
+    {
+     "test": "pytest:tests/unit/test_icd.py::test_cpp_and_python_codecs_agree",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "imu_time_big_endian",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Codec.ImuSampleLayoutIsLittleEndianAsInTheIcd"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps"
+     ]
+    },
+    {
+     "name": "ptp_seq_little_endian",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Codec.PtpIsBigEndianWith48BitSeconds"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Ptp.AnExchangeProducesADelayRequestAndAMeasurement",
+      "gtest:Ptp.MismatchedSequencesAndForeignAnswersAreRejected"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-002",
+   "title": "Lengths are exact",
+   "text": "A payload whose length is not the one its ICD defines (including an array whose count does not match) is rejected.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml",
+    "icd/aam.yaml",
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Codec.WrongLengthsAreRejected",
+     "passed": true,
+     "kills": [
+      "long_imu_accepted"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Codec.ArrayCountMustMatchTheLength",
+     "passed": true,
+     "kills": [
+      "long_packet_accepted"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/unit/test_icd.py::test_cpp_and_python_codecs_agree",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "long_imu_accepted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Codec.WrongLengthsAreRejected"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "long_packet_accepted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Codec.ArrayCountMustMatchTheLength"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-003",
+   "title": "Out-of-range values are not used",
+   "text": "Values outside their ICD range are rejected and counted before any reading is produced from them.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml",
+    "icd/gnss.yaml",
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Codec.RangesComeFromTheIcd",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Imu.OutOfRangeSamplesAreDroppedAndLogged",
+     "passed": true,
+     "kills": [
+      "imu_range_unchecked"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Aam.BadFramesAreCountedNotUsed",
+     "passed": true,
+     "kills": [
+      "heartbeat_state_unchecked"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "imu_range_unchecked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Imu.OutOfRangeSamplesAreDroppedAndLogged"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "heartbeat_state_unchecked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Aam.BadFramesAreCountedNotUsed"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-010",
+   "title": "Frames survive any chunking",
+   "text": "The serial deframer delivers every valid frame whatever the size and boundaries of the reads.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Framing.EveryChunkingDeliversEveryFrame",
+     "passed": true,
+     "kills": [
+      "buffer_reset_per_read",
+      "split_sync_lost"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "buffer_reset_per_read",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Framing.EveryChunkingDeliversEveryFrame"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+      "gtest:Framing.ASyncWordInsideCorruptDataDoesNotHideTheNextFrame",
+      "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt",
+      "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink",
+      "gtest:Framing.CrcErrorsAreCounted",
+      "gtest:Framing.GarbageBeforeAFrameIsDiscarded",
+      "gtest:Framing.RandomCorruptionNeverProducesABadFrame"
+     ]
+    },
+    {
+     "name": "split_sync_lost",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Framing.EveryChunkingDeliversEveryFrame"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+      "gtest:Framing.ASyncWordInsideCorruptDataDoesNotHideTheNextFrame",
+      "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt",
+      "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink",
+      "gtest:Framing.CrcErrorsAreCounted",
+      "gtest:Framing.GarbageBeforeAFrameIsDiscarded",
+      "gtest:Framing.RandomCorruptionNeverProducesABadFrame",
+      "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps",
+      "gtest:Imu.DeviceTimeWrapsAt32Bits",
+      "gtest:Imu.LivenessFollowsTheStream",
+      "gtest:Imu.OutOfRangeSamplesAreDroppedAndLogged",
+      "gtest:Imu.SelfTestResultDrivesTheBuiltInTest",
+      "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap",
+      "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-011",
+   "title": "Resynchronisation after corruption",
+   "text": "A corrupted frame costs at most that frame; the next valid frame is delivered, including when the corrupt bytes contain a sync word.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml",
+    "icd/gnss.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Framing.ASyncWordInsideCorruptDataDoesNotHideTheNextFrame",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt",
+     "passed": true,
+     "kills": [
+      "drop_whole_frame_on_crc_error"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Framing.GarbageBeforeAFrameIsDiscarded",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Framing.RandomCorruptionNeverProducesABadFrame",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "drop_whole_frame_on_crc_error",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-012",
+   "title": "CRC errors are counted",
+   "text": "Each frame with a CRC error is counted and reported in diagnostics.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+     "passed": true,
+     "kills": [
+      "crc_errors_not_counted"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Framing.CrcErrorsAreCounted",
+     "passed": true,
+     "kills": [
+      "crc_errors_not_counted"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "crc_errors_not_counted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+      "gtest:Framing.CrcErrorsAreCounted"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-013",
+   "title": "Impossible lengths do not stall a link",
+   "text": "A length longer than the device can send is treated as corruption at once.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink",
+     "passed": true,
+     "kills": [
+      "impossible_length_waited_for"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "impossible_length_waited_for",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-020",
+   "title": "IMU samples carry acquisition time",
+   "text": "IMU samples are stamped with the time they were taken (device time mapped to local time by a running minimum of arrival minus device time), so transport jitter does not move time stamps by more than 30 us.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#imu.latency_window"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps",
+     "passed": true,
+     "kills": [
+      "arrival_time_stamps"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "arrival_time_stamps",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-021",
+   "title": "Lost IMU samples are counted",
+   "text": "Gaps in the 16-bit sample counter are counted across its wrap; gaps longer than imu.max_gap_samples are logged as faults.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#imu.max_gap_samples"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap",
+     "passed": true,
+     "kills": [
+      "gap_without_wrap",
+      "gap_threshold_ignored"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "gap_without_wrap",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "gap_threshold_ignored",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-022",
+   "title": "Device time wraps",
+   "text": "The 32-bit microsecond device time is unwrapped so time stamps stay continuous across its wrap.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Imu.DeviceTimeWrapsAt32Bits",
+     "passed": true,
+     "kills": [
+      "device_time_not_unwrapped"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "device_time_not_unwrapped",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Imu.DeviceTimeWrapsAt32Bits"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-023",
+   "title": "IMU start-up and supervision",
+   "text": "The unit commands an IMU self-test and then streaming, repeats both every second while no samples arrive, logs a lost IMU, and reports the IMU healthy only after a passed self-test with samples arriving.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.TheImuIsSelfTestedAndStartedAndRestartedWhenItGoesQuiet",
+     "passed": true,
+     "kills": [
+      "start_before_self_test"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Imu.SelfTestResultDrivesTheBuiltInTest",
+     "passed": true,
+     "kills": [
+      "self_test_ignored"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Imu.LivenessFollowsTheStream",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "self_test_ignored",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Imu.SelfTestResultDrivesTheBuiltInTest"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "start_before_self_test",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.TheImuIsSelfTestedAndStartedAndRestartedWhenItGoesQuiet"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-030",
+   "title": "Module supervision",
+   "text": "A module without heartbeat for aam.heartbeat_timeout_ms is reported lost, logged once, and fails the module built-in test; a module the armed plan uses is supervised from arming, even if it has never sent a heartbeat.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#aam.heartbeat_timeout_ms"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Aam.AModuleWithoutHeartbeatIsLostOnce",
+     "passed": true,
+     "kills": [
+      "heartbeat_timeout_ten_times",
+      "loss_logged_repeatedly"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Aam.AModuleThePlanUsesIsSupervisedBeforeItsFirstHeartbeat",
+     "passed": true,
+     "kills": [
+      "heartbeat_timeout_ten_times",
+      "silent_module_never_supervised"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "heartbeat_timeout_ten_times",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Aam.AModuleThePlanUsesIsSupervisedBeforeItsFirstHeartbeat",
+      "gtest:Aam.AModuleWithoutHeartbeatIsLostOnce"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "loss_logged_repeatedly",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Aam.AModuleWithoutHeartbeatIsLostOnce"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "silent_module_never_supervised",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Aam.AModuleThePlanUsesIsSupervisedBeforeItsFirstHeartbeat"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-031",
+   "title": "Lost data frames are detected per group",
+   "text": "Each data group's frame counter is checked separately; a missing frame is counted and logged.",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Aam.CountersArePerGroup",
+     "passed": true,
+     "kills": [
+      "one_counter_per_module"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "one_counter_per_module",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Aam.CountersArePerGroup"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-032",
+   "title": "Engineering values and over-range",
+   "text": "Counts are converted with the channel's range, scale and offset; a count at full scale is flagged over-range.",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml",
+    "config/unit.yaml#aam.overrange_raw"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange",
+     "passed": true,
+     "kills": [
+      "overrange_off_by_one",
+      "millivolts_scaled_wrong"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "overrange_off_by_one",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "millivolts_scaled_wrong",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Unit.AlarmFlagsFollowThePlanLimits"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-040",
+   "title": "Plans are parsed strictly",
+   "text": "Unknown statements or keys, duplicate keys, malformed numbers and missing required keys reject the plan (PLN-01, PLN-02).",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.AGoodPlanIsAccepted",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Plan.SyntaxIsStrict",
+     "passed": true,
+     "kills": [
+      "duplicate_keys_accepted",
+      "unknown_key_noted_not_refused"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "duplicate_keys_accepted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.SyntaxIsStrict"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "unknown_key_noted_not_refused",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.SyntaxIsStrict"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-041",
+   "title": "Channel names and count",
+   "text": "Channel names are unique and 1-16 of a-z, 0-9, _; a plan has 1..plan.max_channels channels (PLN-03, PLN-04).",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#plan.max_channels"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.NamesAndCount",
+     "passed": true,
+     "kills": [
+      "duplicate_names_accepted"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "duplicate_names_accepted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.NamesAndCount"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-042",
+   "title": "Sources exist",
+   "text": "Every channel names a module 1..32 and input that exists, or an IMU field that exists (PLN-05).",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml",
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.SourcesMustExist",
+     "passed": true,
+     "kills": [
+      "input_bound_off_by_one"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "input_bound_off_by_one",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.SourcesMustExist"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-043",
+   "title": "Rates are achievable",
+   "text": "Module rates are the base rate over an allowed divisor; IMU rates are one of plan.allowed_imu_rates_hz (PLN-06).",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml",
+    "config/unit.yaml#plan.allowed_imu_rates_hz"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.RatesMustBeAchievable",
+     "passed": true,
+     "kills": [
+      "module_rate_unchecked",
+      "fractional_imu_rate_truncated"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "module_rate_unchecked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.RatesMustBeAchievable"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Unit.AnInvalidPlanIsRefusedAndTheOldOneStays"
+     ]
+    },
+    {
+     "name": "fractional_imu_rate_truncated",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.RatesMustBeAchievable"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-044",
+   "title": "Ranges and filters exist",
+   "text": "Every range and filter is one the module offers (PLN-07).",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.RangesAndFiltersMustExist",
+     "passed": true,
+     "kills": [
+      "range_unchecked"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "range_unchecked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.RangesAndFiltersMustExist"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-045",
+   "title": "Inputs in one data frame share a rate",
+   "text": "Inputs carried in the same data frame must be planned at the same rate (PLN-08).",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.InputsSharingADataFrameShareARate",
+     "passed": true,
+     "kills": [
+      "wrong_group_size"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "wrong_group_size",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.InputsSharingADataFrameShareARate"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Plan.AGoodPlanIsAccepted",
+      "gtest:Plan.SyntaxIsStrict"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-046",
+   "title": "An input is used once",
+   "text": "No physical input or IMU field appears in two channels (PLN-09).",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.AnInputIsUsedOnce",
+     "passed": true,
+     "kills": [
+      "inputs_reusable"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "inputs_reusable",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.AnInputIsUsedOnce"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-047",
+   "title": "Alarm limits are measurable",
+   "text": "Alarm limits are ordered and inside what the channel can measure given its range, scale and offset; scale is not zero (PLN-10, PLN-13).",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.AlarmsMustLieInsideWhatTheChannelMeasures",
+     "passed": true,
+     "kills": [
+      "high_alarm_unchecked",
+      "negative_scale_not_ordered"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Plan.ScaleMustNotBeZero",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "high_alarm_unchecked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.AlarmsMustLieInsideWhatTheChannelMeasures"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "negative_scale_not_ordered",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.AlarmsMustLieInsideWhatTheChannelMeasures"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-048",
+   "title": "CAN bus load",
+   "text": "The plan's worst-case CAN bus load, with bit stuffing, does not exceed plan.max_can_bus_load (PLN-11).",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml",
+    "config/unit.yaml#plan.max_can_bus_load"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.CanFrameBitsIncludeWorstCaseStuffing",
+     "passed": true,
+     "kills": [
+      "no_bit_stuffing"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Plan.BusLoadIsWorstCase",
+     "passed": true,
+     "kills": [
+      "no_bit_stuffing",
+      "bus_limit_ignored"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_bit_stuffing",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.BusLoadIsWorstCase",
+      "gtest:Plan.CanFrameBitsIncludeWorstCaseStuffing"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "bus_limit_ignored",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.BusLoadIsWorstCase"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-049",
+   "title": "Telemetry link budget",
+   "text": "The plan's telemetry bit rate, with packet and network overhead, does not exceed plan.telemetry_link_bps (PLN-12).",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml",
+    "config/unit.yaml#plan.telemetry_link_bps",
+    "config/unit.yaml#plan.frame_period_ms"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Plan.TelemetryMustFitTheLink",
+     "passed": true,
+     "kills": [
+      "overhead_ignored"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "overhead_ignored",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Plan.TelemetryMustFitTheLink"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-050",
+   "title": "Register writes are acknowledged",
+   "text": "Every register request is answered within plan.reg_timeout_ms or retried, at most plan.reg_retries times; then the load fails.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#plan.reg_timeout_ms",
+    "config/unit.yaml#plan.reg_retries"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Loader.AnUnansweredRequestIsRetriedThreeTimesThenFails",
+     "passed": true,
+     "kills": [
+      "no_retries",
+      "one_retry_too_many"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Loader.ALostAnswerIsRecoveredByARetry",
+     "passed": true,
+     "kills": [
+      "no_retries"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_a_silent_module_fails_the_load_after_retries",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_retries",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.ALostAnswerIsRecoveredByARetry",
+      "gtest:Loader.AnUnansweredRequestIsRetriedThreeTimesThenFails"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Loader.ALateAnswerToAnEarlierRequestIsNotTakenForTheCurrentOne"
+     ]
+    },
+    {
+     "name": "one_retry_too_many",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.AnUnansweredRequestIsRetriedThreeTimesThenFails"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-051",
+   "title": "Aborts fail the load",
+   "text": "A module abort fails the load at once with the module's abort code.",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Loader.AnAbortFailsTheLoad",
+     "passed": true,
+     "kills": [
+      "abort_ignored"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "abort_ignored",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.AnAbortFailsTheLoad"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-052",
+   "title": "Configuration is read back",
+   "text": "After commit every written register is read back and compared; a mismatch fails the load. All inputs of a used module are written.",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+     "passed": true,
+     "kills": [
+      "only_enabled_inputs_written"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Loader.AReadBackMismatchFailsTheLoad",
+     "passed": true,
+     "kills": [
+      "readback_not_compared"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Plan.RegistersConfigureEveryInputOfAUsedModule",
+     "passed": true,
+     "kills": [
+      "only_enabled_inputs_written"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "readback_not_compared",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.AReadBackMismatchFailsTheLoad"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "only_enabled_inputs_written",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+      "gtest:Plan.RegistersConfigureEveryInputOfAUsedModule"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Loader.ALostAnswerIsRecoveredByARetry"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-053",
+   "title": "Module configuration CRC",
+   "text": "Each module's configuration CRC must equal the CRC computed from the plan; otherwise the load fails and is logged.",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.AFailedLoadNeverArms",
+     "passed": true,
+     "kills": [
+      "module_crc_not_read"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+     "passed": true,
+     "kills": [
+      "module_crc_not_read"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Loader.AWrongModuleCrcFailsTheLoad",
+     "passed": true,
+     "kills": [
+      "module_crc_not_read"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_a_module_reporting_the_wrong_configuration_crc_is_never_armed",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "module_crc_not_read",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+      "gtest:Loader.AWrongModuleCrcFailsTheLoad",
+      "gtest:Unit.AFailedLoadNeverArms"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Loader.ALostAnswerIsRecoveredByARetry"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-054",
+   "title": "Telemetry only under an armed plan",
+   "text": "No telemetry is sent until a plan is loaded and verified; every packet carries the CRC of the plan in force; a rejected plan leaves the armed one in force.",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.NoTelemetryUntilThePlanIsArmed",
+     "passed": true,
+     "kills": [
+      "armed_without_verification",
+      "plan_crc_not_sent"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Unit.AnInvalidPlanIsRefusedAndTheOldOneStays",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Unit.AFailedLoadNeverArms",
+     "passed": true,
+     "kills": [
+      "armed_without_verification"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Plan.CanonicalFormIgnoresLayout",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_plan_is_loaded_and_telemetry_is_intact",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_a_module_reporting_the_wrong_configuration_crc_is_never_armed",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "armed_without_verification",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.AFailedLoadNeverArms",
+      "gtest:Unit.NoTelemetryUntilThePlanIsArmed"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "plan_crc_not_sent",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.NoTelemetryUntilThePlanIsArmed"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-055",
+   "title": "Late answers are not misattributed",
+   "text": "An answer to an earlier request is never taken as the answer to the current one.",
+   "method": "test",
+   "cites": [
+    "icd/aam.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Loader.ALateAnswerToAnEarlierRequestIsNotTakenForTheCurrentOne",
+     "passed": true,
+     "kills": [
+      "answer_not_matched"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "answer_not_matched",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Loader.ALateAnswerToAnEarlierRequestIsNotTakenForTheCurrentOne"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-060",
+   "title": "PTP exchange",
+   "text": "Offset and path delay are computed from the two-step end-to-end exchange; Follow_Up and Delay_Resp are matched by sequence id and requester identity; other domains and versions are ignored. The PTP servo removes a constant oscillator error.",
+   "method": "test",
+   "cites": [
+    "icd/ptp.yaml",
+    "config/unit.yaml#timing.ptp_kp",
+    "config/unit.yaml#timing.ptp_ki"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Ptp.AnExchangeProducesADelayRequestAndAMeasurement",
+     "passed": true,
+     "kills": [
+      "delay_formula_sign"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Ptp.MismatchedSequencesAndForeignAnswersAreRejected",
+     "passed": true,
+     "kills": [
+      "requester_not_checked"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Ptp.OtherDomainsAndVersionsAreIgnored",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift",
+     "passed": true,
+     "kills": [
+      "delay_formula_sign"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_time_stamps_are_within_a_millisecond_of_true_time",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "requester_not_checked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Ptp.MismatchedSequencesAndForeignAnswersAreRejected"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "delay_formula_sign",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Ptp.AnExchangeProducesADelayRequestAndAMeasurement",
+      "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift"
+     ],
+     "caught_by_unlinked": [
+      "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep",
+      "gtest:TimeSync.DelayOutliersAreDiscarded",
+      "gtest:TimeSync.FailsOverAtOnceAndReturnsOnlyAfterTheHoldTime",
+      "gtest:TimeSync.HoldoverThenFreeRunning",
+      "gtest:TimeSync.LockNeedsEightConsecutiveGoodMeasurements",
+      "gtest:TimeSync.SmallOffsetsAreSlewedLargeOnesStepped"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-061",
+   "title": "Delay outliers",
+   "text": "An exchange whose path delay exceeds timing.ptp_outlier_factor times the running minimum does not adjust the clock.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#timing.ptp_outlier_factor",
+    "config/unit.yaml#timing.ptp_min_window"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:TimeSync.DelayOutliersAreDiscarded",
+     "passed": true,
+     "kills": [
+      "no_outlier_filter"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_outlier_filter",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.DelayOutliersAreDiscarded"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-062",
+   "title": "GNSS time is checked",
+   "text": "A GNSS time message is used only with valid time and leap flags, a 2D or 3D fix, accuracy within timing.gnss_max_acc_ns, and within timing.gnss_max_msg_delay_ms of its PPS edge; each edge is used once.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#timing.gnss_max_acc_ns",
+    "config/unit.yaml#timing.gnss_max_msg_delay_ms"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:TimeSync.GnssTimeIsCheckedBeforeUse",
+     "passed": true,
+     "kills": [
+      "edge_reused",
+      "accuracy_limit_loose"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:TimeSync.GpsTimeConvertsToUtc",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_gnss_alone_keeps_time",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "edge_reused",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.GnssTimeIsCheckedBeforeUse"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "accuracy_limit_loose",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.GnssTimeIsCheckedBeforeUse"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-063",
+   "title": "Slew, do not step",
+   "text": "Offsets up to 1 ms are removed by adjusting the clock rate, so time never runs backwards; larger offsets step the clock and are logged.",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:TimeSync.SmallOffsetsAreSlewedLargeOnesStepped",
+     "passed": true,
+     "kills": [
+      "steps_small_offsets"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "steps_small_offsets",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.SmallOffsetsAreSlewedLargeOnesStepped"
+     ],
+     "caught_by_unlinked": [
+      "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep",
+      "gtest:TimeSync.HoldoverThenFreeRunning",
+      "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-064",
+   "title": "Lock",
+   "text": "Lock is declared after timing.lock_count consecutive measurements within the active source's lock threshold and lost on one beyond its unlock threshold.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#timing.lock_count",
+    "config/unit.yaml#timing.ptp_lock_threshold_ns",
+    "config/unit.yaml#timing.ptp_unlock_threshold_ns",
+    "config/unit.yaml#timing.gnss_lock_threshold_ns",
+    "config/unit.yaml#timing.gnss_unlock_threshold_ns"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:TimeSync.LockNeedsEightConsecutiveGoodMeasurements",
+     "passed": true,
+     "kills": [
+      "lock_one_early"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep",
+     "passed": true,
+     "kills": [
+      "unlock_threshold_loose"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_time_stamps_are_within_a_millisecond_of_true_time",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "lock_one_early",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.LockNeedsEightConsecutiveGoodMeasurements"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "unlock_threshold_loose",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-065",
+   "title": "Holdover and free-running",
+   "text": "Without measurements for timing.holdover_start_ms the unit enters holdover at the learned rate (quality 1); after timing.holdover_max_ms it is free-running (quality 0).",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#timing.holdover_start_ms",
+    "config/unit.yaml#timing.holdover_max_ms"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:TimeSync.HoldoverThenFreeRunning",
+     "passed": true,
+     "kills": [
+      "no_holdover",
+      "holdover_too_long"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_holdover",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.HoldoverThenFreeRunning"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "holdover_too_long",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.HoldoverThenFreeRunning"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-066",
+   "title": "Source selection",
+   "text": "Sources are used in timing.sources priority; the unit fails over at once when the active source is lost and returns to a better one only after it has been good for timing.switch_hold_ms.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#timing.sources",
+    "config/unit.yaml#timing.switch_hold_ms"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:TimeSync.FailsOverAtOnceAndReturnsOnlyAfterTheHoldTime",
+     "passed": true,
+     "kills": [
+      "no_switch_hold"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_gnss_alone_keeps_time",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_switch_hold",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:TimeSync.FailsOverAtOnceAndReturnsOnlyAfterTheHoldTime"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-067",
+   "title": "Time-stamp accuracy end to end",
+   "text": "While locked to PTP on the bench, 99 % of module samples are stamped within 1 ms of true time.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#timing"
+   ],
+   "status": "verified, system level (no mutants)",
+   "evidence": "",
+   "links": [
+    {
+     "test": "pytest:tests/system/test_bench.py::test_time_stamps_are_within_a_millisecond_of_true_time",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_gnss_alone_keeps_time",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": []
+  },
+  {
+   "id": "SRS-070",
+   "title": "Packet integrity",
+   "text": "Every telemetry packet ends with a CRC-32 over the packet and carries a sequence number one above the previous one.",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.PacketsCarryACrcAndConsecutiveSequenceNumbers",
+     "passed": true,
+     "kills": [
+      "crc_short",
+      "sequence_skips"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_plan_is_loaded_and_telemetry_is_intact",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "crc_short",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.PacketsCarryACrcAndConsecutiveSequenceNumbers"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Unit.AlarmFlagsFollowThePlanLimits",
+      "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate",
+      "gtest:Unit.LateArrivalsAreSortedIntoPlace",
+      "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange",
+      "gtest:Unit.NoTelemetryUntilThePlanIsArmed",
+      "gtest:Unit.SamplesAreInTimeOrderWithOffsetsFromThePacketTime"
+     ]
+    },
+    {
+     "name": "sequence_skips",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.PacketsCarryACrcAndConsecutiveSequenceNumbers"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-071",
+   "title": "Sample order and offsets",
+   "text": "Samples in a packet are in acquisition order, with non-negative offsets from the packet time; every sample sent is counted.",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.SamplesAreInTimeOrderWithOffsetsFromThePacketTime",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Unit.LateArrivalsAreSortedIntoPlace",
+     "passed": true,
+     "kills": [
+      "not_sorted"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_every_sample_arrives_in_order_and_imu_channels_are_decimated",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "not_sorted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.LateArrivalsAreSortedIntoPlace"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-072",
+   "title": "Alarm flags",
+   "text": "A sample below its alarm low limit carries alarm_low, above its high limit alarm_high.",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.AlarmFlagsFollowThePlanLimits",
+     "passed": true,
+     "kills": [
+      "high_alarm_flagged_low"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "high_alarm_flagged_low",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.AlarmFlagsFollowThePlanLimits"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-073",
+   "title": "IMU decimation",
+   "text": "IMU channels are decimated from 400 Hz to their planned rate.",
+   "method": "test",
+   "cites": [
+    "icd/imu.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate",
+     "passed": true,
+     "kills": [
+      "no_decimation"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "pytest:tests/system/test_bench.py::test_every_sample_arrives_in_order_and_imu_channels_are_decimated",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_decimation",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-080",
+   "title": "Status",
+   "text": "A status request returns uptime, software version, boot slot, built-in test, time state and source, offset, link counters and the plan CRC.",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.DiagnosticsReportTheUnitsState",
+     "passed": true,
+     "kills": [
+      "status_without_plan_crc"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "status_without_plan_crc",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.DiagnosticsReportTheUnitsState"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-081",
+   "title": "Bounded fault log",
+   "text": "The fault log holds diag.fault_log_capacity records; repeats within one second are folded; when full the oldest is overwritten and counted.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#diag.fault_log_capacity"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:FaultLog.RepeatsWithinASecondAreFolded",
+     "passed": true,
+     "kills": [
+      "no_folding"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:FaultLog.ABabblingSourceCannotFlushOlderFaults",
+     "passed": true,
+     "kills": [
+      "no_folding"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:FaultLog.WhenFullTheOldestIsOverwritten",
+     "passed": true,
+     "kills": [
+      "overwrites_not_counted"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "no_folding",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:FaultLog.ABabblingSourceCannotFlushOlderFaults",
+      "gtest:FaultLog.RepeatsWithinASecondAreFolded"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "overwrites_not_counted",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:FaultLog.WhenFullTheOldestIsOverwritten"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-082",
+   "title": "Malformed requests",
+   "text": "A malformed diagnostic request is logged and not answered.",
+   "method": "test",
+   "cites": [
+    "icd/tlm.yaml"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Unit.MalformedDiagnosticRequestsAreLoggedNotAnswered",
+     "passed": true,
+     "kills": [
+      "request_range_unchecked"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "request_range_unchecked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Unit.MalformedDiagnosticRequestsAreLoggedNotAnswered"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-090",
+   "title": "Signed packages only",
+   "text": "A package is accepted only if its Ed25519 signature over the header verifies against the release key and the image matches the signed hash; nothing is written otherwise.",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.OnlyPackagesSignedByTheReleaseKeyAreAccepted",
+     "passed": true,
+     "kills": [
+      "signature_not_checked",
+      "hash_not_checked"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Update.ARejectedPackageWritesNothing",
+     "passed": true,
+     "kills": [
+      "signature_not_checked"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "signature_not_checked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.ARejectedPackageWritesNothing",
+      "gtest:Update.OnlyPackagesSignedByTheReleaseKeyAreAccepted"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "hash_not_checked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.OnlyPackagesSignedByTheReleaseKeyAreAccepted"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Update.ADamagedPendingImageIsNeverBooted",
+      "gtest:Update.BootVerifiesTheImageItIsAboutToRun"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-091",
+   "title": "Hardware match",
+   "text": "A package built for other hardware (unit.hw_id) is refused.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#unit.hw_id"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.PackagesForOtherHardwareAreRefused",
+     "passed": true,
+     "kills": [
+      "hardware_not_checked"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "hardware_not_checked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.PackagesForOtherHardwareAreRefused"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-092",
+   "title": "Anti-rollback",
+   "text": "A package below the security floor is refused; the floor rises only when a new image is confirmed.",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.OlderSecurityVersionsAreRefusedAndTheFloorRisesOnlyOnConfirm",
+     "passed": true,
+     "kills": [
+      "floor_off_by_one",
+      "floor_never_raised"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "floor_off_by_one",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.OlderSecurityVersionsAreRefusedAndTheFloorRisesOnlyOnConfirm"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "floor_never_raised",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.OlderSecurityVersionsAreRefusedAndTheFloorRisesOnlyOnConfirm"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-093",
+   "title": "Inactive slot only",
+   "text": "Install writes only the inactive slot and reads it back before marking it pending.",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.InstallWritesTheInactiveSlotAndVerifiesIt",
+     "passed": true,
+     "kills": [
+      "writes_active_slot"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "writes_active_slot",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.InstallWritesTheInactiveSlotAndVerifiesIt"
+     ],
+     "caught_by_unlinked": [
+      "gtest:Update.AConfirmedImageBecomesActive",
+      "gtest:Update.ADamagedPendingImageIsNeverBooted",
+      "gtest:Update.AnUnconfirmedImageIsRolledBackAfterThreeTrialBoots"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "SRS-094",
+   "title": "Trial boot",
+   "text": "A pending image gets update.max_trial_boots boots; unless confirmed by the application it is rolled back.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml#update.max_trial_boots"
+   ],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.AnUnconfirmedImageIsRolledBackAfterThreeTrialBoots",
+     "passed": true,
+     "kills": [
+      "unlimited_trials"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Update.AConfirmedImageBecomesActive",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "unlimited_trials",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.AnUnconfirmedImageIsRolledBackAfterThreeTrialBoots"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-095",
+   "title": "Verified boot",
+   "text": "The boot selector verifies the image it is about to boot; a damaged active image falls back to a verified other slot, and with none the unit does not boot.",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.BootVerifiesTheImageItIsAboutToRun",
+     "passed": true,
+     "kills": [
+      "active_not_verified"
+     ],
+     "proof": "proven"
+    },
+    {
+     "test": "gtest:Update.ADamagedPendingImageIsNeverBooted",
+     "passed": true,
+     "kills": [
+      "pending_not_verified"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "pending_not_verified",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.ADamagedPendingImageIsNeverBooted"
+     ],
+     "caught_by_unlinked": []
+    },
+    {
+     "name": "active_not_verified",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.BootVerifiesTheImageItIsAboutToRun"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-096",
+   "title": "Power loss during update",
+   "text": "Losing power at any write leaves a bootable, verified image.",
+   "method": "test",
+   "cites": [],
+   "status": "verified",
+   "evidence": "",
+   "links": [
+    {
+     "test": "gtest:Update.PowerLossAtAnyWriteLeavesABootableVerifiedImage",
+     "passed": true,
+     "kills": [],
+     "proof": "unproven"
+    },
+    {
+     "test": "gtest:Update.FileStoreRoundTripsAndRejectsACorruptState",
+     "passed": true,
+     "kills": [
+      "state_crc_not_checked"
+     ],
+     "proof": "proven"
+    }
+   ],
+   "mutants": [
+    {
+     "name": "state_crc_not_checked",
+     "outcome": "killed",
+     "caught_by": [
+      "gtest:Update.FileStoreRoundTripsAndRejectsACorruptState"
+     ],
+     "caught_by_unlinked": []
+    }
+   ]
+  },
+  {
+   "id": "SRS-100",
+   "title": "Exact replay",
+   "text": "Replaying a recording of the unit's inputs reproduces its telemetry byte for byte.",
+   "method": "test",
+   "cites": [],
+   "status": "verified, system level (no mutants)",
+   "evidence": "",
+   "links": [
+    {
+     "test": "pytest:tests/system/test_bench.py::test_replay_reproduces_the_telemetry_byte_for_byte",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": []
+  },
+  {
+   "id": "SRS-101",
+   "title": "Fault campaign",
+   "text": "Under the bench fault campaign (bit errors, dropped and out-of-range samples, a lost module, a GNSS outage, PTP outage and jitter, module register faults) the unit keeps running, reports each fault, and sends no packet with a bad CRC.",
+   "method": "test",
+   "cites": [
+    "config/unit.yaml"
+   ],
+   "status": "verified, system level (no mutants)",
+   "evidence": "",
+   "links": [
+    {
+     "test": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+     "passed": true,
+     "kills": [],
+     "proof": "system"
+    }
+   ],
+   "mutants": []
+  },
+  {
+   "id": "SRS-110",
+   "title": "Reproducible build",
+   "text": "Two builds of the same sources with the same toolchain in different directories produce identical binaries.",
+   "method": "analysis",
+   "cites": [
+    "CMakeLists.txt"
+   ],
+   "status": "verified",
+   "evidence": "reports/assurance/repro.json",
+   "links": [],
+   "mutants": []
+  },
+  {
+   "id": "SRS-111",
+   "title": "Hardened binaries",
+   "text": "Shipped binaries are position independent, with full RELRO, a non-executable stack, stack protection and CET.",
+   "method": "inspection",
+   "cites": [
+    "CMakeLists.txt"
+   ],
+   "status": "verified",
+   "evidence": "reports/assurance/hardening.json",
+   "links": [],
+   "mutants": []
+  },
+  {
+   "id": "SRS-112",
+   "title": "Static analysis clean",
+   "text": "clang-tidy and cppcheck report no findings in shipped code; sanitizer builds pass every unit test.",
+   "method": "analysis",
+   "cites": [
+    ".clang-tidy"
+   ],
+   "status": "verified",
+   "evidence": "reports/assurance/static.json, reports/assurance/sanitize.json",
+   "links": [],
+   "mutants": []
+  },
+  {
+   "id": "SRS-113",
+   "title": "Release evidence",
+   "text": "Every release carries its SBOM, the test evidence, the traceability matrix and a configuration manifest, all hashed and signed.",
+   "method": "inspection",
+   "cites": [],
+   "status": "verified",
+   "evidence": "reports/assurance/sbom.json",
+   "links": [],
+   "mutants": []
+  }
+ ]
+}

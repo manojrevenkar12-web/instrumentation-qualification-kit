@@ -1,0 +1,140 @@
+{
+ "bomFormat": "CycloneDX",
+ "specVersion": "1.5",
+ "serialNumber": "urn:uuid:e165d680-dbdb-5a0b-ae48-d859de3c0414",
+ "version": 1,
+ "metadata": {
+  "timestamp": "2026-11-03T10:45:58+00:00",
+  "tools": {
+   "components": [
+    {
+     "type": "application",
+     "name": "iqk assurance sbom"
+    }
+   ]
+  },
+  "component": {
+   "type": "firmware",
+   "bom-ref": "dau-software",
+   "name": "DAU software",
+   "version": "1.4.0",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "47603b5294dd5fc5f703694b0748ede2ce6e2f512d4d04b55d97db76c69f7514"
+    }
+   ]
+  },
+  "properties": [
+   {
+    "name": "build:compiler",
+    "value": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+   },
+   {
+    "name": "build:platform",
+    "value": "Linux-6.18.44-fc-v230-x86_64-with-glibc2.39"
+   }
+  ]
+ },
+ "components": [
+  {
+   "type": "application",
+   "bom-ref": "iqk-daud",
+   "name": "daud",
+   "version": "1.4.0",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "7160b5f3a346040ec36c9387d1edfe41939c9961033096c47888b56d231a7638"
+    }
+   ]
+  },
+  {
+   "type": "application",
+   "bom-ref": "iqk-iqkctl",
+   "name": "iqkctl",
+   "version": "1.4.0",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "2aef508daa6ed45056013a264eeb21e05312c42615f3e71ce6f0787f4c950026"
+    }
+   ]
+  },
+  {
+   "type": "library",
+   "bom-ref": "openssl",
+   "name": "OpenSSL libcrypto",
+   "version": "3.0.13",
+   "purl": "pkg:generic/openssl@3.0.13",
+   "scope": "required"
+  },
+  {
+   "type": "library",
+   "bom-ref": "libstdcxx",
+   "name": "libstdc++",
+   "version": "13.3.0",
+   "scope": "required"
+  },
+  {
+   "type": "library",
+   "bom-ref": "googletest",
+   "name": "GoogleTest",
+   "version": "1.14.0-1",
+   "scope": "excluded",
+   "description": "test only, not shipped"
+  },
+  {
+   "type": "library",
+   "bom-ref": "py-pyyaml",
+   "name": "PyYAML",
+   "version": "6.0.3",
+   "purl": "pkg:pypi/pyyaml@6.0.3",
+   "scope": "excluded",
+   "description": "host tooling (generator, emulators, qualification), not shipped"
+  },
+  {
+   "type": "library",
+   "bom-ref": "py-cryptography",
+   "name": "cryptography",
+   "version": "50.0.1",
+   "purl": "pkg:pypi/cryptography@50.0.1",
+   "scope": "excluded",
+   "description": "host tooling (generator, emulators, qualification), not shipped"
+  },
+  {
+   "type": "library",
+   "bom-ref": "py-hypothesis",
+   "name": "hypothesis",
+   "version": "6.170.14",
+   "purl": "pkg:pypi/hypothesis@6.170.14",
+   "scope": "excluded",
+   "description": "host tooling (generator, emulators, qualification), not shipped"
+  },
+  {
+   "type": "library",
+   "bom-ref": "py-pytest",
+   "name": "pytest",
+   "version": "9.1.1",
+   "purl": "pkg:pypi/pytest@9.1.1",
+   "scope": "excluded",
+   "description": "host tooling (generator, emulators, qualification), not shipped"
+  }
+ ],
+ "dependencies": [
+  {
+   "ref": "iqk-daud",
+   "dependsOn": [
+    "openssl",
+    "libstdcxx"
+   ]
+  },
+  {
+   "ref": "iqk-iqkctl",
+   "dependsOn": [
+    "openssl",
+    "libstdcxx"
+   ]
+  }
+ ]
+}

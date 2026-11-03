@@ -1,7 +1,5 @@
-import { motion } from "motion/react";
 import type { BenchRun } from "../../shared/lib/console";
 import { us } from "../../shared/lib/status";
-import { motionTokens } from "../../shared/theme/tokens";
 import p from "../../shared/ui/panels.module.css";
 import { EmptyState } from "../../shared/ui/states";
 
@@ -24,13 +22,7 @@ function Histogram({ run, title }: { run: BenchRun; title: string }) {
           <div className={p.hbar} key={edges_us[i]}>
             <span>{label(edges_us[i], edges_us[i + 1])}</span>
             <span className={p.track} aria-hidden="true">
-              <motion.span
-                style={{ background: over ? "var(--failed)" : "var(--proven)", height: "100%" }}
-                initial={{ width: 0 }}
-                whileInView={{ width: `${(100 * c) / max}%` }}
-                viewport={{ once: true }}
-                transition={motionTokens.reveal}
-              />
+              <span style={{ background: over ? "var(--failed)" : "var(--proven)", height: "100%", width: `${(100 * c) / max}%` }} />
             </span>
             <span className={p.num}>{((100 * c) / total).toFixed(c && (100 * c) / total < 0.1 ? 2 : 1)}%</span>
           </div>

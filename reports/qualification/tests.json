@@ -1,0 +1,889 @@
+[
+ {
+  "id": "gtest:Crc.CheckValues",
+  "passed": true,
+  "verifies": [
+   "SRS-001"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Codec.ImuSampleLayoutIsLittleEndianAsInTheIcd",
+  "passed": true,
+  "verifies": [
+   "SRS-001"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Codec.PtpIsBigEndianWith48BitSeconds",
+  "passed": true,
+  "verifies": [
+   "SRS-001"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Codec.TelemetryPacketRoundTripsWithItsRecords",
+  "passed": true,
+  "verifies": [
+   "SRS-001"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Codec.WrongLengthsAreRejected",
+  "passed": true,
+  "verifies": [
+   "SRS-002"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Codec.ArrayCountMustMatchTheLength",
+  "passed": true,
+  "verifies": [
+   "SRS-002"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Codec.RangesComeFromTheIcd",
+  "passed": true,
+  "verifies": [
+   "SRS-003"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.NoTelemetryUntilThePlanIsArmed",
+  "passed": true,
+  "verifies": [
+   "SRS-054"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.AnInvalidPlanIsRefusedAndTheOldOneStays",
+  "passed": true,
+  "verifies": [
+   "SRS-054"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.AFailedLoadNeverArms",
+  "passed": true,
+  "verifies": [
+   "SRS-053",
+   "SRS-054"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.PacketsCarryACrcAndConsecutiveSequenceNumbers",
+  "passed": true,
+  "verifies": [
+   "SRS-070"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.SamplesAreInTimeOrderWithOffsetsFromThePacketTime",
+  "passed": true,
+  "verifies": [
+   "SRS-071"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.LateArrivalsAreSortedIntoPlace",
+  "passed": true,
+  "verifies": [
+   "SRS-071"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate",
+  "passed": true,
+  "verifies": [
+   "SRS-073"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange",
+  "passed": true,
+  "verifies": [
+   "SRS-032"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.AlarmFlagsFollowThePlanLimits",
+  "passed": true,
+  "verifies": [
+   "SRS-072"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.DiagnosticsReportTheUnitsState",
+  "passed": true,
+  "verifies": [
+   "SRS-080"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.MalformedDiagnosticRequestsAreLoggedNotAnswered",
+  "passed": true,
+  "verifies": [
+   "SRS-082"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Unit.TheImuIsSelfTestedAndStartedAndRestartedWhenItGoesQuiet",
+  "passed": true,
+  "verifies": [
+   "SRS-023"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps",
+  "passed": true,
+  "verifies": [
+   "SRS-020"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Imu.DeviceTimeWrapsAt32Bits",
+  "passed": true,
+  "verifies": [
+   "SRS-022"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap",
+  "passed": true,
+  "verifies": [
+   "SRS-021"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Imu.OutOfRangeSamplesAreDroppedAndLogged",
+  "passed": true,
+  "verifies": [
+   "SRS-003"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Imu.SelfTestResultDrivesTheBuiltInTest",
+  "passed": true,
+  "verifies": [
+   "SRS-023"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Imu.LivenessFollowsTheStream",
+  "passed": true,
+  "verifies": [
+   "SRS-023"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Aam.AModuleWithoutHeartbeatIsLostOnce",
+  "passed": true,
+  "verifies": [
+   "SRS-030"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Aam.AModuleThePlanUsesIsSupervisedBeforeItsFirstHeartbeat",
+  "passed": true,
+  "verifies": [
+   "SRS-030"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Aam.CountersArePerGroup",
+  "passed": true,
+  "verifies": [
+   "SRS-031"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Aam.BadFramesAreCountedNotUsed",
+  "passed": true,
+  "verifies": [
+   "SRS-003"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:FaultLog.RepeatsWithinASecondAreFolded",
+  "passed": true,
+  "verifies": [
+   "SRS-081"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:FaultLog.ABabblingSourceCannotFlushOlderFaults",
+  "passed": true,
+  "verifies": [
+   "SRS-081"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:FaultLog.WhenFullTheOldestIsOverwritten",
+  "passed": true,
+  "verifies": [
+   "SRS-081"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.EveryChunkingDeliversEveryFrame",
+  "passed": true,
+  "verifies": [
+   "SRS-010"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+  "passed": true,
+  "verifies": [
+   "SRS-011",
+   "SRS-012"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.ASyncWordInsideCorruptDataDoesNotHideTheNextFrame",
+  "passed": true,
+  "verifies": [
+   "SRS-011"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt",
+  "passed": true,
+  "verifies": [
+   "SRS-011"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.GarbageBeforeAFrameIsDiscarded",
+  "passed": true,
+  "verifies": [
+   "SRS-011"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.CrcErrorsAreCounted",
+  "passed": true,
+  "verifies": [
+   "SRS-012"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink",
+  "passed": true,
+  "verifies": [
+   "SRS-013"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Framing.RandomCorruptionNeverProducesABadFrame",
+  "passed": true,
+  "verifies": [
+   "SRS-011"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+  "passed": true,
+  "verifies": [
+   "SRS-052",
+   "SRS-053"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.AnUnansweredRequestIsRetriedThreeTimesThenFails",
+  "passed": true,
+  "verifies": [
+   "SRS-050"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.ALostAnswerIsRecoveredByARetry",
+  "passed": true,
+  "verifies": [
+   "SRS-050"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.AnAbortFailsTheLoad",
+  "passed": true,
+  "verifies": [
+   "SRS-051"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.AReadBackMismatchFailsTheLoad",
+  "passed": true,
+  "verifies": [
+   "SRS-052"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.AWrongModuleCrcFailsTheLoad",
+  "passed": true,
+  "verifies": [
+   "SRS-053"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Loader.ALateAnswerToAnEarlierRequestIsNotTakenForTheCurrentOne",
+  "passed": true,
+  "verifies": [
+   "SRS-055"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.AGoodPlanIsAccepted",
+  "passed": true,
+  "verifies": [
+   "SRS-040"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.SyntaxIsStrict",
+  "passed": true,
+  "verifies": [
+   "SRS-040"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.NamesAndCount",
+  "passed": true,
+  "verifies": [
+   "SRS-041"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.SourcesMustExist",
+  "passed": true,
+  "verifies": [
+   "SRS-042"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.RatesMustBeAchievable",
+  "passed": true,
+  "verifies": [
+   "SRS-043"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.RangesAndFiltersMustExist",
+  "passed": true,
+  "verifies": [
+   "SRS-044"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.InputsSharingADataFrameShareARate",
+  "passed": true,
+  "verifies": [
+   "SRS-045"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.AnInputIsUsedOnce",
+  "passed": true,
+  "verifies": [
+   "SRS-046"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.AlarmsMustLieInsideWhatTheChannelMeasures",
+  "passed": true,
+  "verifies": [
+   "SRS-047"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.ScaleMustNotBeZero",
+  "passed": true,
+  "verifies": [
+   "SRS-047"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.CanFrameBitsIncludeWorstCaseStuffing",
+  "passed": true,
+  "verifies": [
+   "SRS-048"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.BusLoadIsWorstCase",
+  "passed": true,
+  "verifies": [
+   "SRS-048"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.TelemetryMustFitTheLink",
+  "passed": true,
+  "verifies": [
+   "SRS-049"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.CanonicalFormIgnoresLayout",
+  "passed": true,
+  "verifies": [
+   "SRS-054"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Plan.RegistersConfigureEveryInputOfAUsedModule",
+  "passed": true,
+  "verifies": [
+   "SRS-052"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Ptp.AnExchangeProducesADelayRequestAndAMeasurement",
+  "passed": true,
+  "verifies": [
+   "SRS-060"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Ptp.MismatchedSequencesAndForeignAnswersAreRejected",
+  "passed": true,
+  "verifies": [
+   "SRS-060"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Ptp.OtherDomainsAndVersionsAreIgnored",
+  "passed": true,
+  "verifies": [
+   "SRS-060"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift",
+  "passed": true,
+  "verifies": [
+   "SRS-060",
+   "SRS-064"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.LockNeedsEightConsecutiveGoodMeasurements",
+  "passed": true,
+  "verifies": [
+   "SRS-064"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.SmallOffsetsAreSlewedLargeOnesStepped",
+  "passed": true,
+  "verifies": [
+   "SRS-063"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep",
+  "passed": true,
+  "verifies": [
+   "SRS-064"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.DelayOutliersAreDiscarded",
+  "passed": true,
+  "verifies": [
+   "SRS-061"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.HoldoverThenFreeRunning",
+  "passed": true,
+  "verifies": [
+   "SRS-065"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.FailsOverAtOnceAndReturnsOnlyAfterTheHoldTime",
+  "passed": true,
+  "verifies": [
+   "SRS-066"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.GnssTimeIsCheckedBeforeUse",
+  "passed": true,
+  "verifies": [
+   "SRS-062"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:TimeSync.GpsTimeConvertsToUtc",
+  "passed": true,
+  "verifies": [
+   "SRS-062"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.OnlyPackagesSignedByTheReleaseKeyAreAccepted",
+  "passed": true,
+  "verifies": [
+   "SRS-090"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.ARejectedPackageWritesNothing",
+  "passed": true,
+  "verifies": [
+   "SRS-090"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.PackagesForOtherHardwareAreRefused",
+  "passed": true,
+  "verifies": [
+   "SRS-091"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.OlderSecurityVersionsAreRefusedAndTheFloorRisesOnlyOnConfirm",
+  "passed": true,
+  "verifies": [
+   "SRS-092"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.InstallWritesTheInactiveSlotAndVerifiesIt",
+  "passed": true,
+  "verifies": [
+   "SRS-093"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.AnUnconfirmedImageIsRolledBackAfterThreeTrialBoots",
+  "passed": true,
+  "verifies": [
+   "SRS-094"
+  ],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.AConfirmedImageBecomesActive",
+  "passed": true,
+  "verifies": [
+   "SRS-094"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.BootVerifiesTheImageItIsAboutToRun",
+  "passed": true,
+  "verifies": [
+   "SRS-095"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.ADamagedPendingImageIsNeverBooted",
+  "passed": true,
+  "verifies": [
+   "SRS-095"
+  ],
+  "seconds": 0.0,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.PowerLossAtAnyWriteLeavesABootableVerifiedImage",
+  "passed": true,
+  "verifies": [
+   "SRS-096"
+  ],
+  "seconds": 0.007,
+  "message": ""
+ },
+ {
+  "id": "gtest:Update.FileStoreRoundTripsAndRejectsACorruptState",
+  "passed": true,
+  "verifies": [
+   "SRS-096"
+  ],
+  "seconds": 0.004,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_the_plan_is_loaded_and_telemetry_is_intact",
+  "passed": true,
+  "verifies": [
+   "SRS-054",
+   "SRS-070"
+  ],
+  "seconds": 20.746,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_time_stamps_are_within_a_millisecond_of_true_time",
+  "passed": true,
+  "verifies": [
+   "SRS-067",
+   "SRS-060",
+   "SRS-064"
+  ],
+  "seconds": 0.004,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_every_sample_arrives_in_order_and_imu_channels_are_decimated",
+  "passed": true,
+  "verifies": [
+   "SRS-071",
+   "SRS-073"
+  ],
+  "seconds": 0.013,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_replay_reproduces_the_telemetry_byte_for_byte",
+  "passed": true,
+  "verifies": [
+   "SRS-100"
+  ],
+  "seconds": 0.023,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_the_fault_campaign",
+  "passed": true,
+  "verifies": [
+   "SRS-101",
+   "SRS-011",
+   "SRS-021",
+   "SRS-003",
+   "SRS-030",
+   "SRS-066",
+   "SRS-061"
+  ],
+  "seconds": 24.212,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_a_module_reporting_the_wrong_configuration_crc_is_never_armed",
+  "passed": true,
+  "verifies": [
+   "SRS-053",
+   "SRS-054"
+  ],
+  "seconds": 6.722,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_a_silent_module_fails_the_load_after_retries",
+  "passed": true,
+  "verifies": [
+   "SRS-050"
+  ],
+  "seconds": 4.223,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/system/test_bench.py::test_gnss_alone_keeps_time",
+  "passed": true,
+  "verifies": [
+   "SRS-062",
+   "SRS-066",
+   "SRS-067"
+  ],
+  "seconds": 20.806,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/unit/test_icd.py::test_every_icd_loads_and_is_consistent",
+  "passed": true,
+  "verifies": [],
+  "seconds": 0.001,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/unit/test_icd.py::test_a_can_message_must_fit_eight_bytes",
+  "passed": true,
+  "verifies": [],
+  "seconds": 0.015,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/unit/test_icd.py::test_generated_files_are_current",
+  "passed": true,
+  "verifies": [
+   "SRS-001"
+  ],
+  "seconds": 0.036,
+  "message": ""
+ },
+ {
+  "id": "pytest:tests/unit/test_icd.py::test_cpp_and_python_codecs_agree",
+  "passed": true,
+  "verifies": [
+   "SRS-001",
+   "SRS-002"
+  ],
+  "seconds": 1.8630000000000002,
+  "message": ""
+ }
+]

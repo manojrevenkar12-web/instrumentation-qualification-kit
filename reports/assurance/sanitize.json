@@ -1,0 +1,8 @@
+{
+ "pass": true,
+ "tail": [
+  "Running main() from ./googletest/src/gtest_main.cc",
+  "[==========] 85 tests from 12 test suites ran. (337 ms total)",
+  "[  PASSED  ] 85 tests."
+ ]
+}

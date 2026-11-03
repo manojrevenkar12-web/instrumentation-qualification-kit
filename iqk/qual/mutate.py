@@ -123,9 +123,31 @@ class Workspace:
             p = subprocess.run(
                 [str(self.build / "iqk_tests"), f"--gtest_output=xml:{self.xml}"], capture_output=True, timeout=120
             )
-            return p.returncode, _failed(self.xml)
+            rc, failed = p.returncode, _failed(self.xml)
         except subprocess.TimeoutExpired:
-            return -1, ["(timeout)"]
+            rc, failed = -1, []
+        if rc != 0 and not failed:
+            # The run crashed or hung before writing its report: find the responsible tests one at a time.
+            failed = self._one_by_one()
+        return rc, failed
+
+    def _one_by_one(self) -> list[str]:
+        listing = subprocess.run([str(self.build / "iqk_tests"), "--gtest_list_tests"], capture_output=True, text=True)
+        tests, suite = [], ""
+        for line in listing.stdout.splitlines():
+            if not line.startswith(" "):
+                suite = line.strip()
+            elif line.strip():
+                tests.append(suite + line.strip().split()[0])
+        bad = []
+        for t in tests:
+            try:
+                r = subprocess.run([str(self.build / "iqk_tests"), f"--gtest_filter={t}"], capture_output=True, timeout=30)
+                if r.returncode != 0:
+                    bad.append(f"gtest:{t}")
+            except subprocess.TimeoutExpired:
+                bad.append(f"gtest:{t}")
+        return bad
 
 
 def prove(work: Path, only: set[str] | None = None, log=print) -> list[MutantResult]:

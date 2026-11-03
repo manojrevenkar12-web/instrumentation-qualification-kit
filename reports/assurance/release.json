@@ -1,0 +1,9 @@
+{
+ "pass": true,
+ "version": "1.4.0",
+ "manifest_sha256": "985297461cc7282dde02cdfcec43b1bb5d2349efa142b1c1d0a38b56ef5463bb",
+ "missing_evidence": [],
+ "gate": true,
+ "build_signature": true,
+ "engineer_approval": "awaiting engineer sign-off"
+}

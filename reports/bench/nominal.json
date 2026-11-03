@@ -1,0 +1,53 @@
+{
+ "name": "nominal",
+ "seconds": 30.7,
+ "faults_injected": [],
+ "packets": 2398,
+ "samples": 91995,
+ "crc_errors_at_receiver": 0,
+ "time_source": 2,
+ "time_state": 2,
+ "time_error_us": {
+  "n": 22917,
+  "p50": 82.8,
+  "p95": 221.1,
+  "p99": 537.5,
+  "max": 19224.2
+ },
+ "time_error_histogram": {
+  "edges_us": [
+   0,
+   50,
+   100,
+   200,
+   300,
+   500,
+   750,
+   1000,
+   2000,
+   5000
+  ],
+  "counts": [
+   5307,
+   9206,
+   6886,
+   1020,
+   252,
+   78,
+   31,
+   83,
+   36,
+   18
+  ]
+ },
+ "time_quality": {
+  "0": 51,
+  "3": 2347
+ },
+ "faults_logged": {
+  "Clock stepped": 2,
+  "Time source switched": 1,
+  "PTP outlier": 43
+ },
+ "imu_crc_errors": 0
+}

@@ -44,14 +44,14 @@ SRS-023:
 SRS-030:
   - {name: heartbeat_timeout_ten_times, file: cpp/src/drivers.cpp, find: "if (now - n.last_hb > cfg::aam::heartbeat_timeout_ms * 1'000'000) {", replace: "if (now - n.last_hb > cfg::aam::heartbeat_timeout_ms * 10'000'000) {"}
   - {name: loss_logged_repeatedly, file: cpp/src/drivers.cpp, find: "      n.lost_logged = true;\n", replace: ""}
-  - {name: silent_module_never_supervised, file: cpp/include/iqk/drivers.hpp, find: "        n.last_hb = now;\n", replace: ""}
+  - {name: silent_module_never_supervised, file: cpp/include/iqk/drivers.hpp, find: "        n.last_hb = now;\n", replace: "        (void)now;\n"}
 SRS-031:
   - {name: one_counter_per_module, file: cpp/include/iqk/drivers.hpp, find: "auto& g = n.groups[d.mux];", replace: "auto& g = n.groups[0];"}
 SRS-032:
   - {name: overrange_off_by_one, file: cpp/src/dau.cpp, find: "std::abs(static_cast<int>(raw)) >= cfg::aam::overrange_raw;", replace: "std::abs(static_cast<int>(raw)) > cfg::aam::overrange_raw;"}
   - {name: millivolts_scaled_wrong, file: cpp/src/dau.cpp, find: "static_cast<double>(c.range_mv) / 1000.0;", replace: "static_cast<double>(c.range_mv) / 100.0;"}
 SRS-040:
-  - {name: duplicate_keys_accepted, file: cpp/src/plan.cpp, find: "if (!seen.insert(k).second) {", replace: "if (false) {"}
+  - {name: duplicate_keys_accepted, file: cpp/src/plan.cpp, find: "if (!seen.insert(k).second) {", replace: "if (!seen.insert(k).second && false) {"}
   - {name: unknown_key_noted_not_refused, file: cpp/src/plan.cpp, after: "for this source\");", find: "        line_ok = false;\n", replace: ""}
 SRS-041:
   - {name: duplicate_names_accepted, file: cpp/src/plan.cpp, find: "if (!names.insert(c.name).second) {", replace: "if (false) {"}

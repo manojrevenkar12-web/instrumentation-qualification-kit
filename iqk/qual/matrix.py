@@ -22,7 +22,7 @@ ASSURANCE = {
     "SRS-110": ["repro"],
     "SRS-111": ["hardening"],
     "SRS-112": ["static", "sanitize"],
-    "SRS-113": ["sbom", "release"],
+    "SRS-113": ["sbom"],  # the release bundle itself is built after the gate, from it
 }
 
 

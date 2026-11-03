@@ -4,6 +4,15 @@ import { EmptyState } from "../../shared/ui/states";
 
 type Rec = Record<string, unknown>;
 
+const HARDENING: Record<string, string> = {
+  pie: "PIE",
+  full_relro: "full RELRO",
+  nx_stack: "NX stack",
+  stack_protector: "stack protector",
+  fortify: "FORTIFY",
+  cet_ibt_shstk: "CET (IBT, shadow stack)",
+};
+
 function Check({ ok, label, detail }: { ok: boolean | undefined; label: string; detail: string }) {
   return (
     <tr>
@@ -54,8 +63,8 @@ export function Supply({ c }: { c: Console }) {
                 label="Hardened binaries"
                 detail={
                   Object.keys(flags)
-                    .map((k) => k.replaceAll("_", " "))
-                    .join(", ") || "PIE, RELRO, NX, canary, FORTIFY, CET"
+                    .map((k) => HARDENING[k] ?? k)
+                    .join(", ") || "PIE, full RELRO, NX stack, stack protector, FORTIFY, CET"
                 }
               />
               <Check

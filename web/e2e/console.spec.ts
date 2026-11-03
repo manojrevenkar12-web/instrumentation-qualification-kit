@@ -5,6 +5,7 @@ test.describe("evidence console", () => {
   test("has no accessibility violations", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.waitForTimeout(1500); // the strip's one reveal has finished
     const r = await new AxeBuilder({ page }).analyze();
     expect(r.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
   });
@@ -22,7 +23,7 @@ test.describe("evidence console", () => {
     await tile.focus();
     await page.keyboard.press("Enter");
     await expect(tile).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByRole("heading", { level: 3 })).toContainText("SRS-063");
+    await expect(page.getByRole("heading", { level: 2, name: /^SRS-063/ })).toBeVisible();
   });
 
   test("explains a missing report and recovers on retry", async ({ page }) => {

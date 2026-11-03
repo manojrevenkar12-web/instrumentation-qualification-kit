@@ -24,9 +24,9 @@ export function RequirementDetail({ r }: { r: Requirement }) {
         transition={motionTokens.quick}
       >
         <div>
-          <h3 className={s.dTitle}>
+          <h2 className={s.dTitle}>
             <span className={s.dId}>{r.id}</span> {r.title}
-          </h3>
+          </h2>
           <p className={s.dText}>{r.text}</p>
           <span className={s.badge} style={{ color: tone.fg, background: tone.bg }}>
             {statusLabel(r.status)}

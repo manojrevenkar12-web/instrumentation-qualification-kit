@@ -53,7 +53,7 @@ describe("evidence console", () => {
     render(<App />);
     const h1 = await screen.findByRole("heading", { level: 1 });
     expect(h1.textContent).toContain("cannot ship yet: 1 of 3");
-    expect(screen.getByRole("heading", { level: 3 }).textContent).toContain("SRS-011");
+    expect(screen.getByRole("heading", { level: 2, name: /^SRS-011/ })).toBeTruthy();
     expect(screen.getByText("not caught (survived)")).toBeTruthy();
   });
 
@@ -63,7 +63,7 @@ describe("evidence console", () => {
     const tile = await screen.findByRole("button", { name: /^SRS-020/ });
     fireEvent.click(tile);
     expect(tile.getAttribute("aria-pressed")).toBe("true");
-    expect(await screen.findByRole("heading", { level: 3, name: /SRS-020/ })).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 2, name: /^SRS-020/ })).toBeTruthy();
   });
 
   it("shows empty states for evidence that has not been produced", async () => {
