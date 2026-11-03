@@ -1,0 +1,21 @@
+{
+ "pass": true,
+ "binaries": {
+  "daud": {
+   "pie": true,
+   "full_relro": true,
+   "nx_stack": true,
+   "stack_protector": true,
+   "fortify": true,
+   "cet_ibt_shstk": true
+  },
+  "iqkctl": {
+   "pie": true,
+   "full_relro": true,
+   "nx_stack": true,
+   "stack_protector": true,
+   "fortify": true,
+   "cet_ibt_shstk": true
+  }
+ }
+}

@@ -18,6 +18,7 @@
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #include <cstring>
 #include <ctime>
 #include <fstream>
@@ -78,18 +79,28 @@ int udp_bind(int port) {
   a.sin_port = htons(static_cast<std::uint16_t>(port));
   a.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
   if (fd < 0 || ::bind(fd, reinterpret_cast<sockaddr*>(&a), sizeof a) != 0) {
-    std::fprintf(stderr, "bind %d: %s\n", port, std::strerror(errno));
+    (void)std::fprintf(stderr, "bind %d: %s\n", port, std::strerror(errno));
     return -1;
   }
   return fd;
+}
+
+// A decimal integer from a command-line value; 0 when the value is not one.
+long long to_ll(const std::string& s) {
+  char* end = nullptr;
+  errno = 0;
+  const long long v = std::strtoll(s.c_str(), &end, 10);
+  return (errno != 0 || end == s.c_str() || *end != '\0') ? 0 : v;
 }
 
 sockaddr_in addr(const std::string& host_port) {
   sockaddr_in a{};
   const auto c = host_port.rfind(':');
   a.sin_family = AF_INET;
-  a.sin_port = htons(static_cast<std::uint16_t>(std::atoi(host_port.substr(c + 1).c_str())));
-  inet_pton(AF_INET, host_port.substr(0, c).c_str(), &a.sin_addr);
+  a.sin_port = htons(static_cast<std::uint16_t>(to_ll(host_port.substr(c + 1))));
+  if (inet_pton(AF_INET, host_port.substr(0, c).c_str(), &a.sin_addr) != 1) {
+    (void)std::fprintf(stderr, "bad address %s\n", host_port.c_str());
+  }
   return a;
 }
 
@@ -106,11 +117,11 @@ class Recorder {
     }
     std::array<std::uint8_t, 13> h{};
     h[0] = port;
-    for (int i = 0; i < 8; ++i) {
-      h[static_cast<std::size_t>(1 + i)] = static_cast<std::uint8_t>((static_cast<std::uint64_t>(t) >> (8 * i)) & 0xFFU);
+    for (std::size_t i = 0; i < 8; ++i) {
+      h[1 + i] = static_cast<std::uint8_t>((static_cast<std::uint64_t>(t) >> (8U * i)) & 0xFFU);
     }
-    for (int i = 0; i < 4; ++i) {
-      h[static_cast<std::size_t>(9 + i)] = static_cast<std::uint8_t>((b.size() >> (8 * i)) & 0xFFU);
+    for (std::size_t i = 0; i < 4; ++i) {
+      h[9 + i] = static_cast<std::uint8_t>((b.size() >> (8U * i)) & 0xFFU);
     }
     f_.write(reinterpret_cast<const char*>(h.data()), h.size());
     f_.write(reinterpret_cast<const char*>(b.data()), static_cast<std::streamsize>(b.size()));
@@ -133,8 +144,8 @@ int main(int argc, char** argv) {
     a[argv[i]] = argv[i + 1];
   }
   auto get = [&](const std::string& k) { return a.contains(k) ? a[k] : std::string{}; };
-  std::signal(SIGTERM, on_signal);
-  std::signal(SIGINT, on_signal);
+  (void)std::signal(SIGTERM, on_signal);
+  (void)std::signal(SIGINT, on_signal);
 
   const std::uint64_t clock_id = a.contains("--clock-id") ? std::strtoull(get("--clock-id").c_str(), nullptr, 16) : 0x0A0B0C0D0E0F1011ULL;
   iqk::Dau dau{clock_id};
@@ -149,11 +160,11 @@ int main(int argc, char** argv) {
 
   const int imu = get("--imu-tty").empty() ? -1 : open_tty(get("--imu-tty"), iqk::icd::imu::kBaud);
   const int gnss = get("--gnss-tty").empty() ? -1 : open_tty(get("--gnss-tty"), iqk::icd::gnss::kBaud);
-  const int pps = get("--pps-port").empty() ? -1 : udp_bind(std::atoi(get("--pps-port").c_str()));
-  const int can = get("--can-port").empty() ? -1 : udp_bind(std::atoi(get("--can-port").c_str()));
-  const int ptp_ev = get("--ptp-event-port").empty() ? -1 : udp_bind(std::atoi(get("--ptp-event-port").c_str()));
-  const int ptp_gen = get("--ptp-general-port").empty() ? -1 : udp_bind(std::atoi(get("--ptp-general-port").c_str()));
-  const int diag = get("--diag-port").empty() ? -1 : udp_bind(std::atoi(get("--diag-port").c_str()));
+  const int pps = get("--pps-port").empty() ? -1 : udp_bind(static_cast<int>(to_ll(get("--pps-port"))));
+  const int can = get("--can-port").empty() ? -1 : udp_bind(static_cast<int>(to_ll(get("--can-port"))));
+  const int ptp_ev = get("--ptp-event-port").empty() ? -1 : udp_bind(static_cast<int>(to_ll(get("--ptp-event-port"))));
+  const int ptp_gen = get("--ptp-general-port").empty() ? -1 : udp_bind(static_cast<int>(to_ll(get("--ptp-general-port"))));
+  const int diag = get("--diag-port").empty() ? -1 : udp_bind(static_cast<int>(to_ll(get("--diag-port"))));
   const int out = ::socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
   const sockaddr_in can_peer = addr(get("--can-peer").empty() ? "127.0.0.1:0" : get("--can-peer"));
   const sockaddr_in ptp_master = addr(get("--ptp-master").empty() ? "127.0.0.1:0" : get("--ptp-master"));
@@ -199,7 +210,7 @@ int main(int argc, char** argv) {
     rec.put(0xFD, t, std::span{reinterpret_cast<const std::uint8_t*>(text.data()), text.size()});
     if (!dau.load_plan(text, t, findings)) {
       for (const auto& x : findings) {
-        std::fprintf(stderr, "plan %s line %d: %s\n", x.rule.c_str(), x.line, x.detail.c_str());
+        (void)std::fprintf(stderr, "plan %s line %d: %s\n", x.rule.c_str(), x.line, x.detail.c_str());
       }
     }
   }
@@ -218,12 +229,13 @@ int main(int argc, char** argv) {
     }
   }
   std::vector<pollfd> pfds;
+  pfds.reserve(srcs.size());
   for (const auto& s : srcs) {
     pfds.push_back(pollfd{s.fd, POLLIN, 0});
   }
 
   const std::int64_t start = mono_ns();
-  const std::int64_t run_ns = a.contains("--run-ms") ? std::atoll(get("--run-ms").c_str()) * 1'000'000 : INT64_MAX;
+  const std::int64_t run_ns = a.contains("--run-ms") ? to_ll(get("--run-ms")) * 1'000'000 : INT64_MAX;
   std::int64_t last_tick = 0;
   std::array<std::uint8_t, 2048> buf{};
   while (g_stop == 0 && mono_ns() - start < run_ns) {

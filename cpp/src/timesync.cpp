@@ -194,11 +194,11 @@ void TimeSync::on_gnss_time(const icd::gnss::TimePulse& m, std::int64_t local_ns
   } else if (local_ns < *pps_edge_ || local_ns - *pps_edge_ > cfg::gnss_max_msg_delay_ms * 1'000'000) {
     reason = 5;  // the message does not belong to the last edge
   }
-  if (reason != 0) {
+  if (reason != 0 || !pps_edge_.has_value()) {
     emit(Event::Kind::gnss_rejected, local_ns, reason);
     return;
   }
-  const std::int64_t edge = *pps_edge_;
+  const std::int64_t edge = pps_edge_.value();
   pps_edge_.reset();  // each edge is used once
   measurement(Source::gnss, edge, gps_to_utc_ns(m.week, m.tow_ms, m.leap_s));
 }

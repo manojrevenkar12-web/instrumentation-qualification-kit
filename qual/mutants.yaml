@@ -7,8 +7,18 @@ SRS-001:
   - {name: imu_time_big_endian, file: cpp/gen/iqk/icd/imu.hpp, find: "wire::put(out, off, wire::to_raw(m.t_us), 4, wire::Order::little);", replace: "wire::put(out, off, wire::to_raw(m.t_us), 4, wire::Order::big);"}
   - {name: ptp_seq_little_endian, file: cpp/gen/iqk/icd/ptp.hpp, after: "encode(const PtpFollowUp& m", find: "wire::put(out, off, wire::to_raw(m.sequence_id), 2, wire::Order::big);", replace: "wire::put(out, off, wire::to_raw(m.sequence_id), 2, wire::Order::little);"}
 SRS-002:
-  - {name: short_imu_accepted, file: cpp/gen/iqk/icd/imu.hpp, find: "if (in.size() != ImuSample::kSize) { return false; }", replace: "if (in.size() < ImuSample::kSize) { return false; }"}
-  - {name: array_count_unchecked, file: cpp/gen/iqk/icd/tlm.hpp, find: "if (m.samples_count > TlmPacket::kMaxRecords ||", replace: "if (m.samples_count > 255 ||"}
+  # The generated decoders check the length twice (on entry and on exit), so a single edit cannot violate
+  # this requirement; each mutant removes both checks.
+  - name: long_imu_accepted
+    file: cpp/gen/iqk/icd/imu.hpp
+    edits:
+      - {find: "if (in.size() != ImuSample::kSize) { return false; }", replace: "if (in.size() < ImuSample::kSize) { return false; }"}
+      - {after: "decode(std::span<const std::uint8_t> in, ImuSample& m)", find: "return off == in.size();", replace: "return true;"}
+  - name: long_packet_accepted
+    file: cpp/gen/iqk/icd/tlm.hpp
+    edits:
+      - {find: "in.size() != TlmPacket::kFixedSize + std::size_t{m.samples_count} * TlmPacket::kRecordSize) { return false; }", replace: "in.size() < TlmPacket::kFixedSize + std::size_t{m.samples_count} * TlmPacket::kRecordSize) { return false; }"}
+      - {after: "decode(std::span<const std::uint8_t> in, TlmPacket& m)", find: "return off == in.size();", replace: "return true;"}
 SRS-003:
   - {name: imu_range_unchecked, file: cpp/include/iqk/drivers.hpp, find: "if (!icd::imu::in_range(out.s)) {", replace: "if (false) {"}
   - {name: heartbeat_state_unchecked, file: cpp/include/iqk/drivers.hpp, find: "if (!icd::aam::decode(f.payload(), hb) || !icd::aam::in_range(hb)) {", replace: "if (!icd::aam::decode(f.payload(), hb)) {"}
@@ -62,7 +72,7 @@ SRS-048:
   - {name: no_bit_stuffing, file: cpp/include/iqk/plan.hpp, find: "return 8 * n + 47 + (34 + 8 * n - 1) / 4; }", replace: "return 8 * n + 47; }"}
   - {name: bus_limit_ignored, file: cpp/src/plan.cpp, find: "load > pcfg::max_can_bus_load) {", replace: "load > 1.0) {"}
 SRS-049:
-  - {name: overhead_ignored, file: cpp/src/plan.cpp, find: "const double packet_overhead = static_cast<double>(tlm::TlmPacket::kFixedSize) + 4.0 + kUdpIpEth;", replace: "const double packet_overhead = 0.0;"}
+  - {name: overhead_ignored, file: cpp/src/plan.cpp, find: "const double packet_overhead = static_cast<double>(tlm::TlmPacket::kFixedSize) + 4.0 + kUdpIpEth;", replace: "const double packet_overhead = 0.0 * kUdpIpEth;"}
 SRS-050:
   - {name: no_retries, file: cpp/src/loader.cpp, find: "if (attempts_ > cfg::plan::reg_retries) {", replace: "if (attempts_ > 0) {"}
   - {name: one_retry_too_many, file: cpp/src/loader.cpp, find: "if (attempts_ > cfg::plan::reg_retries) {", replace: "if (attempts_ > cfg::plan::reg_retries + 1) {"}
@@ -82,7 +92,7 @@ SRS-060:
   - {name: requester_not_checked, file: cpp/src/timesync.cpp, find: "        m.req_clock_identity != id_ || t3_ == INT64_MIN || !have_t1_) {", replace: "        t3_ == INT64_MIN || !have_t1_) {"}
   - {name: delay_formula_sign, file: cpp/src/timesync.cpp, find: "const std::int64_t delay = ((t2 - t1) + (t4 - t3)) / 2;", replace: "const std::int64_t delay = ((t2 - t1) - (t4 - t3)) / 2;"}
 SRS-061:
-  - {name: no_outlier_filter, file: cpp/src/timesync.cpp, find: "if (delay < 0 || (min_delay != INT64_MAX && delay > cfg::ptp_outlier_factor * floor)) {", replace: "if (delay < 0) {"}
+  - {name: no_outlier_filter, file: cpp/src/timesync.cpp, find: "delay > cfg::ptp_outlier_factor * floor)) {", replace: "delay > cfg::ptp_outlier_factor * floor * 1000000)) {"}
 SRS-062:
   - {name: edge_reused, file: cpp/src/timesync.cpp, find: "  pps_edge_.reset();  // each edge is used once\n", replace: ""}
   - {name: accuracy_limit_loose, file: cpp/src/timesync.cpp, find: "} else if (m.acc_ns > static_cast<std::uint32_t>(cfg::gnss_max_acc_ns)) {", replace: "} else if (m.acc_ns > static_cast<std::uint32_t>(cfg::gnss_max_acc_ns * 10)) {"}
@@ -113,10 +123,10 @@ SRS-081:
 SRS-082:
   - {name: request_range_unchecked, file: cpp/src/dau.cpp, find: "if (!tlm::decode(req, r) || !tlm::in_range(r)) {", replace: "if (!tlm::decode(req, r)) {"}
 SRS-090:
-  - {name: signature_not_checked, file: cpp/src/update.cpp, find: "if (!ed25519_verify(anchor, pkg.first(kHeaderSize), pkg.subspan(kHeaderSize, kSignatureSize))) {", replace: "if (false) {"}
+  - {name: signature_not_checked, file: cpp/src/update.cpp, find: "if (!ed25519_verify(anchor, pkg.first(kHeaderSize), pkg.subspan(kHeaderSize, kSignatureSize))) {", replace: "if (!ed25519_verify(anchor, pkg.first(kHeaderSize), pkg.subspan(kHeaderSize, kSignatureSize)) && false) {"}
   - {name: hash_not_checked, file: cpp/src/update.cpp, find: "if (sha256(pkg.subspan(kPrefixSize)) != h.sha256) {", replace: "if (false) {"}
 SRS-091:
-  - {name: hardware_not_checked, file: cpp/src/update.cpp, find: "if (h.hw_id != hw_id) {", replace: "if (false) {"}
+  - {name: hardware_not_checked, file: cpp/src/update.cpp, find: "if (h.hw_id != hw_id) {", replace: "if (h.hw_id != hw_id && false) {"}
 SRS-092:
   - {name: floor_off_by_one, file: cpp/src/update.cpp, find: "if (h.security_version < security_floor) {", replace: "if (h.security_version + 1 < security_floor) {"}
   - {name: floor_never_raised, file: cpp/src/update.cpp, find: "  s.security_floor = std::max(s.security_floor, h.security_version);\n", replace: ""}

@@ -128,7 +128,7 @@ void add(std::vector<Finding>& f, const char* rule, int line, std::string detail
 
 std::string fmt(double v) {
   char b[32];
-  std::snprintf(b, sizeof b, "%.9g", v);
+  (void)std::snprintf(b, sizeof b, "%.9g", v);
   return b;
 }
 

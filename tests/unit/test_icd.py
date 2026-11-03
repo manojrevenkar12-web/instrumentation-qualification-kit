@@ -69,13 +69,19 @@ def test_cpp_and_python_codecs_agree(build, key, name, data):
     values = _values(msg, data.draw)
     payload = I.encode(d, msg, values)
     # C++ decodes what Python encoded ...
-    out = subprocess.run([str(build / "iqkctl"), "codec", "decode", key, name, payload.hex()], capture_output=True, text=True)
+    out = subprocess.run(
+        [str(build / "iqkctl"), "codec", "decode", key, name, payload.hex()], capture_output=True, text=True
+    )
     assert out.returncode == 0, out.stdout
     assert out.stdout == _kv(values)
     # ... and encodes the same bytes from the same values.
-    enc = subprocess.run([str(build / "iqkctl"), "codec", "encode", key, name], input=_kv(values), capture_output=True, text=True)
+    enc = subprocess.run(
+        [str(build / "iqkctl"), "codec", "encode", key, name], input=_kv(values), capture_output=True, text=True
+    )
     assert enc.stdout.strip() == payload.hex()
     # A byte more or less is rejected by both.
     assert I.decode(d, msg, payload + b"\x00") is None
-    bad = subprocess.run([str(build / "iqkctl"), "codec", "decode", key, name, (payload + b"\x00").hex()], capture_output=True, text=True)
+    bad = subprocess.run(
+        [str(build / "iqkctl"), "codec", "decode", key, name, (payload + b"\x00").hex()], capture_output=True, text=True
+    )
     assert bad.returncode != 0

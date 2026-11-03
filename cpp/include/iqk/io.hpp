@@ -18,7 +18,7 @@ namespace iqk::io {
   while ((n = std::fread(buf.data(), 1, buf.size(), f)) > 0) {
     out.append(buf.data(), n);
   }
-  std::fclose(f);
+  (void)std::fclose(f);
   return out;
 }
 

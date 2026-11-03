@@ -85,7 +85,9 @@ def _struct(name: str, fields: tuple[I.Field, ...], msg: I.Message | None, arr_s
 def _codec(name: str, msg: I.Message, order: str, arr_struct: str | None) -> list[str]:
     o = "wire::Order::little" if order == "little" else "wire::Order::big"
     fields = (*msg.header, *msg.fields)
-    size_expr = "m.kSize" if msg.array is None else f"m.kFixedSize + std::size_t{{m.{msg.array.name}_count}} * m.kRecordSize"
+    size_expr = (
+        "m.kSize" if msg.array is None else f"m.kFixedSize + std::size_t{{m.{msg.array.name}_count}} * m.kRecordSize"
+    )
     enc = [
         f"[[nodiscard]] inline std::size_t encode(const {name}& m, std::span<std::uint8_t> out) noexcept {{",
     ]
@@ -109,9 +111,7 @@ def _codec(name: str, msg: I.Message, order: str, arr_struct: str | None) -> lis
             enc.append(f"  off += {cs};")
             enc.append(f"  for (std::size_t i = 0; i < m.{f.name}_count; ++i) {{")
             enc.append(f"    const auto& r = m.{f.name}[i];")
-            dec.append(
-                f"  m.{f.name}_count = static_cast<{CTYPE[f.count]}>(wire::get(in, off, {cs}, {o}));"
-            )
+            dec.append(f"  m.{f.name}_count = static_cast<{CTYPE[f.count]}>(wire::get(in, off, {cs}, {o}));")
             dec.append(f"  off += {cs};")
             dec.append(
                 f"  if (m.{f.name}_count > {name}::kMaxRecords || in.size() != {name}::kFixedSize + std::size_t{{m.{f.name}_count}} * {name}::kRecordSize) {{ return false; }}"
@@ -275,16 +275,31 @@ def doc(key: str) -> str:
     if d.extra:
         out.append("")
     if "registers" in d.extra:
-        out += ["## Registers", "", "Per-channel registers are at index + channel (0..channels-1).", "",
-                "| Index | Sub | Name | Values | Notes |", "|---|---:|---|---|---|"]
+        out += [
+            "## Registers",
+            "",
+            "Per-channel registers are at index + channel (0..channels-1).",
+            "",
+            "| Index | Sub | Name | Values | Notes |",
+            "|---|---:|---|---|---|",
+        ]
         for r in d.extra["registers"]:
             idx = f"0x{r['index']:04X}" + (" + ch" if r.get("per_channel") else "")
-            vals = (f"{r['range'][0]}..{r['range'][1]}" if "range" in r else
-                    f"one of `{r['values_from']}`" if "values_from" in r else "")
+            vals = (
+                f"{r['range'][0]}..{r['range'][1]}"
+                if "range" in r
+                else f"one of `{r['values_from']}`"
+                if "values_from" in r
+                else ""
+            )
             out.append(f"| {idx} | {r['sub']} | {r['name']} | {vals} | {r.get('description', '')} |")
         out.append("")
     for m in d.messages:
-        size = f"{m.fixed_size} bytes" if m.array is None else f"{m.fixed_size} + {m.record_size} × n bytes (n ≤ {m.array.max})"
+        size = (
+            f"{m.fixed_size} bytes"
+            if m.array is None
+            else f"{m.fixed_size} + {m.record_size} × n bytes (n ≤ {m.array.max})"
+        )
         idtxt = f"0x{m.id:X}" + (" + node id" if m.per_node else "")
         rate = f", {m.rate_hz} Hz" if m.rate_hz else ""
         out += [f"## {m.name}", "", f"Id {idtxt}, {m.direction.replace('_', ' ')}{rate}, {size}.", ""]
@@ -298,7 +313,9 @@ def doc(key: str) -> str:
                 off += I.SIZES[f.count]
                 r = 0
                 for g in f.of:
-                    out.append(f"| +{r} | {f.name}[i].{g.name} | {g.type} | {g.scale or ''} | {g.unit} | | {_notes(g)} |")
+                    out.append(
+                        f"| +{r} | {f.name}[i].{g.name} | {g.type} | {g.scale or ''} | {g.unit} | | {_notes(g)} |"
+                    )
                     r += g.size
                 continue
             rng = f"{f.range[0]:g} .. {f.range[1]:g}" if f.range else ""

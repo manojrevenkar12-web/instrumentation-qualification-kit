@@ -31,6 +31,8 @@ struct Rig {
   std::vector<std::vector<std::uint8_t>> diag;
   std::int64_t now{kS};
   std::uint16_t imu_seq{0};
+  bool hold_imu{false};                        // the serial driver holds IMU frames back
+  std::vector<std::vector<std::uint8_t>> held;
 
   iqk::Tx tx() {
     return [this](Port p, std::span<const std::uint8_t> b) {
@@ -74,7 +76,11 @@ struct Rig {
     if (now % 2'500'000 < kMs) {
       const auto f = iqk_test::imu_frame(iqk_test::imu_sample(imu_seq, static_cast<std::uint32_t>(now / 1000)));
       ++imu_seq;
-      dau.on_input(Port::imu, f, now + 200'000, tx());
+      if (hold_imu) {
+        held.push_back(f);
+      } else {
+        dau.on_input(Port::imu, f, now + 200'000, tx());
+      }
     }
     dau.tick(now, tx());
     now += kMs;
@@ -203,19 +209,17 @@ TEST(Unit, LateArrivalsAreSortedIntoPlace) {
   std::vector<iqk::plan::Finding> f;
   ASSERT_TRUE(r.dau.load_plan(kPlan, r.now, f));
   r.run_ms(600);
+  // The IMU keeps sampling, but its frames are held up for 8 ms while module frames keep arriving; then the
+  // held frames arrive in one burst. Their samples were taken before the module samples stamped meanwhile.
+  r.hold_imu = true;
+  r.run_ms(8);
+  r.hold_imu = false;
+  ASSERT_GE(r.held.size(), 3U);
   r.tlm.clear();
-  // Module samples now, then four IMU samples taken earlier that were held up in the serial driver.
-  for (int k = 0; k < 4; ++k) {
-    r.can(iqk_test::data_frame(1, 0, static_cast<std::uint8_t>(200 + k), 1, 0, 0));
-  }
-  const std::int64_t taken = r.now - 6 * kMs;
-  for (int k = 0; k < 4; ++k) {
-    const auto fr = iqk_test::imu_frame(iqk_test::imu_sample(static_cast<std::uint16_t>(r.imu_seq + k * 2),
-                                                             static_cast<std::uint32_t>((taken + k * 2'500'000) / 1000)));
+  for (const auto& fr : r.held) {
     r.dau.on_input(Port::imu, fr, r.now, r.tx());
   }
-  r.imu_seq = static_cast<std::uint16_t>(r.imu_seq + 8);
-  r.run_ms(40, false);
+  r.run_ms(40);
   bool checked = false;
   for (const auto& p : decode(r.tlm)) {
     for (std::size_t i = 1; i < p.samples_count; ++i) {

@@ -28,8 +28,8 @@ struct MdFree {
 };
 
 bool ed25519_verify(const PublicKey& pk, std::span<const std::uint8_t> msg, std::span<const std::uint8_t> sig) {
-  std::unique_ptr<EVP_PKEY, PkeyFree> key{EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, nullptr, pk.data(), pk.size())};
-  std::unique_ptr<EVP_MD_CTX, MdFree> ctx{EVP_MD_CTX_new()};
+  const std::unique_ptr<EVP_PKEY, PkeyFree> key{EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, nullptr, pk.data(), pk.size())};
+  const std::unique_ptr<EVP_MD_CTX, MdFree> ctx{EVP_MD_CTX_new()};
   if (!key || !ctx || EVP_DigestVerifyInit(ctx.get(), nullptr, nullptr, nullptr, key.get()) != 1) {
     return false;
   }
@@ -81,7 +81,7 @@ std::vector<std::uint8_t> read_all(const std::string& path) {
   while ((n = std::fread(buf.data(), 1, buf.size(), f)) > 0) {
     out.insert(out.end(), buf.begin(), buf.begin() + static_cast<std::ptrdiff_t>(n));
   }
-  std::fclose(f);
+  (void)std::fclose(f);
   return out;
 }
 
@@ -160,9 +160,9 @@ std::vector<std::uint8_t> build(const Header& in, std::span<const std::uint8_t> 
   h.sha256 = sha256(image);
   std::vector<std::uint8_t> pkg(kPrefixSize + image.size());
   put_header(h, pkg);
-  std::unique_ptr<EVP_PKEY, PkeyFree> key{
+  const std::unique_ptr<EVP_PKEY, PkeyFree> key{
       EVP_PKEY_new_raw_private_key(EVP_PKEY_ED25519, nullptr, private_key.data(), private_key.size())};
-  std::unique_ptr<EVP_MD_CTX, MdFree> ctx{EVP_MD_CTX_new()};
+  const std::unique_ptr<EVP_MD_CTX, MdFree> ctx{EVP_MD_CTX_new()};
   std::size_t sig_len = kSignatureSize;
   if (!key || !ctx || EVP_DigestSignInit(ctx.get(), nullptr, nullptr, nullptr, key.get()) != 1 ||
       EVP_DigestSign(ctx.get(), pkg.data() + kHeaderSize, &sig_len, pkg.data(), kHeaderSize) != 1) {
@@ -174,7 +174,7 @@ std::vector<std::uint8_t> build(const Header& in, std::span<const std::uint8_t> 
 
 PublicKey public_key_of(std::span<const std::uint8_t, 32> private_key) {
   PublicKey pk{};
-  std::unique_ptr<EVP_PKEY, PkeyFree> key{
+  const std::unique_ptr<EVP_PKEY, PkeyFree> key{
       EVP_PKEY_new_raw_private_key(EVP_PKEY_ED25519, nullptr, private_key.data(), private_key.size())};
   std::size_t n = pk.size();
   if (key) {

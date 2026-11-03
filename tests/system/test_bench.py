@@ -16,7 +16,9 @@ PLAN = (ROOT / "examples" / "plans" / "bench.plan").read_text()
 
 
 def plan_crc(build) -> int:
-    out = subprocess.run([str(build / "iqkctl"), "validate", str(ROOT / "examples/plans/bench.plan")], capture_output=True, text=True)
+    out = subprocess.run(
+        [str(build / "iqkctl"), "validate", str(ROOT / "examples/plans/bench.plan")], capture_output=True, text=True
+    )
     return int(json.loads(out.stdout.strip().splitlines()[-1])["crc"], 16)
 
 
@@ -45,7 +47,7 @@ def test_the_plan_is_loaded_and_telemetry_is_intact(nominal, build):
 @pytest.mark.verifies("SRS-067", "SRS-060", "SRS-064")
 def test_time_stamps_are_within_a_millisecond_of_true_time(nominal):
     assert nominal.status["time_source"] == 2  # PTP
-    assert nominal.status["time_state"] == 2   # locked
+    assert nominal.status["time_state"] == 2  # locked
     errs = nominal.timecode_errors_us
     assert len(errs) > 5000
     assert p99(errs) < 1000, f"p99 {p99(errs):.0f} us"
@@ -94,12 +96,12 @@ def test_the_fault_campaign(build, tmp_path):
     r = Bench(tmp_path, PLAN, faults, seed=5).run(24)
     codes = {int(k): v for k, v in r.status["fault_codes"].items()}
     assert r.crc_errors == 0
-    assert codes.get(2, 0) > 0     # imu CRC errors detected
-    assert codes.get(1, 0) > 0     # imu gap (the 200 ms silence) logged
-    assert codes.get(3, 0) > 0     # out-of-range samples rejected
-    assert codes.get(10, 0) == 1   # module 2 lost, once
-    assert codes.get(26, 0) > 0    # PTP outliers discarded
-    assert codes.get(24, 0) >= 2   # failed over to GNSS and back
+    assert codes.get(2, 0) > 0  # imu CRC errors detected
+    assert codes.get(1, 0) > 0  # imu gap (the 200 ms silence) logged
+    assert codes.get(3, 0) > 0  # out-of-range samples rejected
+    assert codes.get(10, 0) == 1  # module 2 lost, once
+    assert codes.get(26, 0) > 0  # PTP outliers discarded
+    assert codes.get(24, 0) >= 2  # failed over to GNSS and back
     assert r.status["imu_crc_errors"] > 0
     # Telemetry never stopped for longer than 200 ms (module 1 and the IMU kept streaming).
     times = [p.rx_true_ns for p in r.packets]
@@ -123,7 +125,7 @@ def test_a_silent_module_fails_the_load_after_retries(build, tmp_path):
     r = Bench(tmp_path, PLAN, [Fault("aam_no_response")], seed=3).run(4)
     assert r.status["armed"] is False
     assert r.status["loader_failure"] == 1  # timeout
-    assert r.aam_requests == 4               # the first try and three retries
+    assert r.aam_requests == 4  # the first try and three retries
 
 
 @pytest.mark.verifies("SRS-062", "SRS-066", "SRS-067")

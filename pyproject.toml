@@ -1,0 +1,33 @@
+[project]
+name = "iqk"
+version = "1.4.0"
+description = "Integration and qualification kit for a data acquisition unit: ICD-generated codecs, C++ drivers, SITL emulators, mutation-checked traceability"
+requires-python = ">=3.11"
+dependencies = ["pyyaml>=6", "cryptography>=42"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.6"]
+
+[project.scripts]
+iqk = "iqk.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["iqk*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["verifies(*ids): requirements this test verifies", "system: runs the daemon against the emulators"]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["web", "work", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["iqk", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"iqk/icdgen.py" = ["E501"]  # lines of generated C++ are kept whole so they read as the output does

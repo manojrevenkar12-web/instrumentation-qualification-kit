@@ -1,0 +1,879 @@
+[
+ {
+  "requirement": "SRS-001",
+  "name": "imu_time_big_endian",
+  "file": "cpp/gen/iqk/icd/imu.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Codec.ImuSampleLayoutIsLittleEndianAsInTheIcd",
+   "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps"
+  ],
+  "seconds": 13.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-001",
+  "name": "ptp_seq_little_endian",
+  "file": "cpp/gen/iqk/icd/ptp.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Codec.PtpIsBigEndianWith48BitSeconds",
+   "gtest:Ptp.AnExchangeProducesADelayRequestAndAMeasurement",
+   "gtest:Ptp.MismatchedSequencesAndForeignAnswersAreRejected"
+  ],
+  "seconds": 14.0,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-003",
+  "name": "imu_range_unchecked",
+  "file": "cpp/include/iqk/drivers.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Imu.OutOfRangeSamplesAreDroppedAndLogged"
+  ],
+  "seconds": 15.2,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-003",
+  "name": "heartbeat_state_unchecked",
+  "file": "cpp/include/iqk/drivers.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Aam.BadFramesAreCountedNotUsed"
+  ],
+  "seconds": 3.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-010",
+  "name": "buffer_reset_per_read",
+  "file": "cpp/include/iqk/framing.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Framing.EveryChunkingDeliversEveryFrame",
+   "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+   "gtest:Framing.ASyncWordInsideCorruptDataDoesNotHideTheNextFrame",
+   "gtest:Framing.GarbageBeforeAFrameIsDiscarded",
+   "gtest:Framing.CrcErrorsAreCounted",
+   "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink",
+   "gtest:Framing.RandomCorruptionNeverProducesABadFrame"
+  ],
+  "seconds": 13.3,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-010",
+  "name": "split_sync_lost",
+  "file": "cpp/src/framing.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate",
+   "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps",
+   "gtest:Imu.DeviceTimeWrapsAt32Bits",
+   "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap",
+   "gtest:Imu.OutOfRangeSamplesAreDroppedAndLogged",
+   "gtest:Imu.SelfTestResultDrivesTheBuiltInTest",
+   "gtest:Imu.LivenessFollowsTheStream",
+   "gtest:Framing.EveryChunkingDeliversEveryFrame",
+   "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+   "gtest:Framing.ASyncWordInsideCorruptDataDoesNotHideTheNextFrame",
+   "gtest:Framing.GarbageBeforeAFrameIsDiscarded",
+   "gtest:Framing.CrcErrorsAreCounted",
+   "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink",
+   "gtest:Framing.RandomCorruptionNeverProducesABadFrame"
+  ],
+  "seconds": 12.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-012",
+  "name": "crc_errors_not_counted",
+  "file": "cpp/src/framing.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Framing.AFlippedBitCostsOnlyThatFrame",
+   "gtest:Framing.CrcErrorsAreCounted"
+  ],
+  "seconds": 0.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-013",
+  "name": "impossible_length_waited_for",
+  "file": "cpp/src/framing.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Framing.AnImpossibleLengthDoesNotStallTheLink"
+  ],
+  "seconds": 0.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-020",
+  "name": "arrival_time_stamps",
+  "file": "cpp/src/drivers.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Imu.ArrivalJitterDoesNotMoveTimeStamps"
+  ],
+  "seconds": 0.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-021",
+  "name": "gap_without_wrap",
+  "file": "cpp/include/iqk/drivers.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap"
+  ],
+  "seconds": 3.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-021",
+  "name": "gap_threshold_ignored",
+  "file": "cpp/include/iqk/drivers.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Imu.SequenceGapsAreCountedAcrossTheWrap"
+  ],
+  "seconds": 3.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-022",
+  "name": "device_time_not_unwrapped",
+  "file": "cpp/src/drivers.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Imu.DeviceTimeWrapsAt32Bits"
+  ],
+  "seconds": 3.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-023",
+  "name": "self_test_ignored",
+  "file": "cpp/include/iqk/drivers.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Imu.SelfTestResultDrivesTheBuiltInTest"
+  ],
+  "seconds": 3.3,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-023",
+  "name": "start_before_self_test",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.TheImuIsSelfTestedAndStartedAndRestartedWhenItGoesQuiet"
+  ],
+  "seconds": 3.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-030",
+  "name": "heartbeat_timeout_ten_times",
+  "file": "cpp/src/drivers.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Aam.AModuleWithoutHeartbeatIsLostOnce"
+  ],
+  "seconds": 1.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-030",
+  "name": "loss_logged_repeatedly",
+  "file": "cpp/src/drivers.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Aam.AModuleWithoutHeartbeatIsLostOnce"
+  ],
+  "seconds": 0.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-031",
+  "name": "one_counter_per_module",
+  "file": "cpp/include/iqk/drivers.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Aam.CountersArePerGroup"
+  ],
+  "seconds": 3.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-032",
+  "name": "overrange_off_by_one",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange"
+  ],
+  "seconds": 4.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-032",
+  "name": "millivolts_scaled_wrong",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange",
+   "gtest:Unit.AlarmFlagsFollowThePlanLimits"
+  ],
+  "seconds": 1.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-040",
+  "name": "duplicate_keys_accepted",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [],
+  "seconds": 2.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-040",
+  "name": "unknown_key_noted_not_refused",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.SyntaxIsStrict"
+  ],
+  "seconds": 3.2,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-041",
+  "name": "duplicate_names_accepted",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.NamesAndCount"
+  ],
+  "seconds": 2.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-042",
+  "name": "input_bound_off_by_one",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.SourcesMustExist"
+  ],
+  "seconds": 2.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-043",
+  "name": "module_rate_unchecked",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.AnInvalidPlanIsRefusedAndTheOldOneStays",
+   "gtest:Plan.RatesMustBeAchievable"
+  ],
+  "seconds": 2.3,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-043",
+  "name": "fractional_imu_rate_truncated",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.RatesMustBeAchievable"
+  ],
+  "seconds": 3.1,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-044",
+  "name": "range_unchecked",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.RangesAndFiltersMustExist"
+  ],
+  "seconds": 2.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-045",
+  "name": "wrong_group_size",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.AGoodPlanIsAccepted",
+   "gtest:Plan.SyntaxIsStrict",
+   "gtest:Plan.InputsSharingADataFrameShareARate"
+  ],
+  "seconds": 2.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-046",
+  "name": "inputs_reusable",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.AnInputIsUsedOnce"
+  ],
+  "seconds": 2.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-047",
+  "name": "high_alarm_unchecked",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.AlarmsMustLieInsideWhatTheChannelMeasures"
+  ],
+  "seconds": 2.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-047",
+  "name": "negative_scale_not_ordered",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.AlarmsMustLieInsideWhatTheChannelMeasures"
+  ],
+  "seconds": 2.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-048",
+  "name": "no_bit_stuffing",
+  "file": "cpp/include/iqk/plan.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.CanFrameBitsIncludeWorstCaseStuffing",
+   "gtest:Plan.BusLoadIsWorstCase"
+  ],
+  "seconds": 7.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-048",
+  "name": "bus_limit_ignored",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.BusLoadIsWorstCase"
+  ],
+  "seconds": 7.1,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-050",
+  "name": "no_retries",
+  "file": "cpp/src/loader.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Loader.AnUnansweredRequestIsRetriedThreeTimesThenFails",
+   "gtest:Loader.ALostAnswerIsRecoveredByARetry",
+   "gtest:Loader.ALateAnswerToAnEarlierRequestIsNotTakenForTheCurrentOne"
+  ],
+  "seconds": 2.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-050",
+  "name": "one_retry_too_many",
+  "file": "cpp/src/loader.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Loader.AnUnansweredRequestIsRetriedThreeTimesThenFails"
+  ],
+  "seconds": 0.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-051",
+  "name": "abort_ignored",
+  "file": "cpp/src/loader.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Loader.AnAbortFailsTheLoad"
+  ],
+  "seconds": 0.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-052",
+  "name": "readback_not_compared",
+  "file": "cpp/src/loader.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Loader.AReadBackMismatchFailsTheLoad"
+  ],
+  "seconds": 1.0,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-052",
+  "name": "only_enabled_inputs_written",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+   "gtest:Loader.ALostAnswerIsRecoveredByARetry",
+   "gtest:Plan.RegistersConfigureEveryInputOfAUsedModule"
+  ],
+  "seconds": 2.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-053",
+  "name": "module_crc_not_read",
+  "file": "cpp/src/loader.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.AFailedLoadNeverArms",
+   "gtest:Loader.AGoodModuleIsConfiguredVerifiedAndCrcChecked",
+   "gtest:Loader.ALostAnswerIsRecoveredByARetry",
+   "gtest:Loader.AWrongModuleCrcFailsTheLoad"
+  ],
+  "seconds": 2.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-054",
+  "name": "armed_without_verification",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.NoTelemetryUntilThePlanIsArmed",
+   "gtest:Unit.AFailedLoadNeverArms"
+  ],
+  "seconds": 1.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-054",
+  "name": "plan_crc_not_sent",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.NoTelemetryUntilThePlanIsArmed"
+  ],
+  "seconds": 1.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-055",
+  "name": "answer_not_matched",
+  "file": "cpp/src/loader.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Loader.ALateAnswerToAnEarlierRequestIsNotTakenForTheCurrentOne"
+  ],
+  "seconds": 1.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-060",
+  "name": "requester_not_checked",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Ptp.MismatchedSequencesAndForeignAnswersAreRejected"
+  ],
+  "seconds": 0.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-060",
+  "name": "delay_formula_sign",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Ptp.AnExchangeProducesADelayRequestAndAMeasurement",
+   "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift",
+   "gtest:TimeSync.LockNeedsEightConsecutiveGoodMeasurements",
+   "gtest:TimeSync.SmallOffsetsAreSlewedLargeOnesStepped",
+   "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep",
+   "gtest:TimeSync.DelayOutliersAreDiscarded",
+   "gtest:TimeSync.HoldoverThenFreeRunning",
+   "gtest:TimeSync.FailsOverAtOnceAndReturnsOnlyAfterTheHoldTime"
+  ],
+  "seconds": 0.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-062",
+  "name": "edge_reused",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.GnssTimeIsCheckedBeforeUse"
+  ],
+  "seconds": 0.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-062",
+  "name": "accuracy_limit_loose",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.GnssTimeIsCheckedBeforeUse"
+  ],
+  "seconds": 0.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-063",
+  "name": "steps_small_offsets",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.PtpLocksAndRemovesOscillatorDrift",
+   "gtest:TimeSync.SmallOffsetsAreSlewedLargeOnesStepped",
+   "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep",
+   "gtest:TimeSync.HoldoverThenFreeRunning"
+  ],
+  "seconds": 0.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-064",
+  "name": "lock_one_early",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.LockNeedsEightConsecutiveGoodMeasurements"
+  ],
+  "seconds": 0.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-064",
+  "name": "unlock_threshold_loose",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.AnOffsetBeyondTheUnlockThresholdDropsLockWithoutAStep"
+  ],
+  "seconds": 0.9,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-065",
+  "name": "no_holdover",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.HoldoverThenFreeRunning"
+  ],
+  "seconds": 0.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-065",
+  "name": "holdover_too_long",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.HoldoverThenFreeRunning"
+  ],
+  "seconds": 0.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-066",
+  "name": "no_switch_hold",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.FailsOverAtOnceAndReturnsOnlyAfterTheHoldTime"
+  ],
+  "seconds": 0.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-070",
+  "name": "crc_short",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.NoTelemetryUntilThePlanIsArmed",
+   "gtest:Unit.PacketsCarryACrcAndConsecutiveSequenceNumbers",
+   "gtest:Unit.SamplesAreInTimeOrderWithOffsetsFromThePacketTime",
+   "gtest:Unit.LateArrivalsAreSortedIntoPlace",
+   "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate",
+   "gtest:Unit.ModuleCountsBecomeEngineeringValuesWithOverrange",
+   "gtest:Unit.AlarmFlagsFollowThePlanLimits"
+  ],
+  "seconds": 1.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-070",
+  "name": "sequence_skips",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.PacketsCarryACrcAndConsecutiveSequenceNumbers"
+  ],
+  "seconds": 1.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-072",
+  "name": "high_alarm_flagged_low",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.AlarmFlagsFollowThePlanLimits"
+  ],
+  "seconds": 1.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-073",
+  "name": "no_decimation",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.ImuChannelsAreDecimatedToTheirPlannedRate"
+  ],
+  "seconds": 1.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-080",
+  "name": "status_without_plan_crc",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.DiagnosticsReportTheUnitsState"
+  ],
+  "seconds": 1.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-081",
+  "name": "no_folding",
+  "file": "cpp/include/iqk/faultlog.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:FaultLog.RepeatsWithinASecondAreFolded",
+   "gtest:FaultLog.ABabblingSourceCannotFlushOlderFaults"
+  ],
+  "seconds": 4.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-081",
+  "name": "overwrites_not_counted",
+  "file": "cpp/include/iqk/faultlog.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:FaultLog.WhenFullTheOldestIsOverwritten"
+  ],
+  "seconds": 4.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-082",
+  "name": "request_range_unchecked",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.MalformedDiagnosticRequestsAreLoggedNotAnswered"
+  ],
+  "seconds": 4.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-092",
+  "name": "floor_off_by_one",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.OlderSecurityVersionsAreRefusedAndTheFloorRisesOnlyOnConfirm"
+  ],
+  "seconds": 1.2,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-092",
+  "name": "floor_never_raised",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.OlderSecurityVersionsAreRefusedAndTheFloorRisesOnlyOnConfirm"
+  ],
+  "seconds": 1.1,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-093",
+  "name": "writes_active_slot",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [],
+  "seconds": 1.3,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-094",
+  "name": "unlimited_trials",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.AnUnconfirmedImageIsRolledBackAfterThreeTrialBoots"
+  ],
+  "seconds": 1.3,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-095",
+  "name": "pending_not_verified",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.ADamagedPendingImageIsNeverBooted"
+  ],
+  "seconds": 1.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-095",
+  "name": "active_not_verified",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.BootVerifiesTheImageItIsAboutToRun"
+  ],
+  "seconds": 1.2,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-096",
+  "name": "state_crc_not_checked",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.FileStoreRoundTripsAndRejectsACorruptState"
+  ],
+  "seconds": 1.2,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-002",
+  "name": "long_imu_accepted",
+  "file": "cpp/gen/iqk/icd/imu.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Codec.WrongLengthsAreRejected"
+  ],
+  "seconds": 15.0,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-002",
+  "name": "long_packet_accepted",
+  "file": "cpp/gen/iqk/icd/tlm.hpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Codec.ArrayCountMustMatchTheLength"
+  ],
+  "seconds": 15.3,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-011",
+  "name": "drop_whole_frame_on_crc_error",
+  "file": "cpp/src/framing.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Framing.ATruncatedFrameDoesNotTakeTheNextOneWithIt"
+  ],
+  "seconds": 6.5,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-049",
+  "name": "overhead_ignored",
+  "file": "cpp/src/plan.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Plan.TelemetryMustFitTheLink"
+  ],
+  "seconds": 2.7,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-061",
+  "name": "no_outlier_filter",
+  "file": "cpp/src/timesync.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:TimeSync.DelayOutliersAreDiscarded"
+  ],
+  "seconds": 2.8,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-071",
+  "name": "not_sorted",
+  "file": "cpp/src/dau.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Unit.LateArrivalsAreSortedIntoPlace"
+  ],
+  "seconds": 1.4,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-090",
+  "name": "signature_not_checked",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.OnlyPackagesSignedByTheReleaseKeyAreAccepted",
+   "gtest:Update.ARejectedPackageWritesNothing"
+  ],
+  "seconds": 1.6,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-090",
+  "name": "hash_not_checked",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.OnlyPackagesSignedByTheReleaseKeyAreAccepted",
+   "gtest:Update.BootVerifiesTheImageItIsAboutToRun",
+   "gtest:Update.ADamagedPendingImageIsNeverBooted"
+  ],
+  "seconds": 1.2,
+  "detail": ""
+ },
+ {
+  "requirement": "SRS-091",
+  "name": "hardware_not_checked",
+  "file": "cpp/src/update.cpp",
+  "outcome": "killed",
+  "failed_tests": [
+   "gtest:Update.PackagesForOtherHardwareAreRefused"
+  ],
+  "seconds": 1.1,
+  "detail": ""
+ }
+]

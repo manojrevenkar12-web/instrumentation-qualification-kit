@@ -283,7 +283,9 @@ class AamEmulator(Emulator):
         self.sock.sendto(pkt, ("127.0.0.1", self.bench.ports["can"]))
 
     def config_crc(self, node: int) -> int:
-        b = b"".join(struct.pack("<IIII", r["enable"], r["range"], r["divisor"], r["filter"]) for r in self.applied[node])
+        b = b"".join(
+            struct.pack("<IIII", r["enable"], r["range"], r["divisor"], r["filter"]) for r in self.applied[node]
+        )
         return zlib.crc32(b)
 
     def handle(self, pkt: bytes) -> None:
@@ -468,7 +470,12 @@ class PtpMaster(Emulator):
         if (f := self.fault("ptp_jitter")) and self.rng.random() < f.params.get("rate", 0.2):
             extra += f.params.get("ms", 20) / 1000
         t1 = self.master_time()
-        self._send(self.ev, "ptp_event", I.encode(PTP, m, {**self.header(0x0, 44, self.seq, 0), "origin_s": 0, "origin_ns": 0}), extra)
+        self._send(
+            self.ev,
+            "ptp_event",
+            I.encode(PTP, m, {**self.header(0x0, 44, self.seq, 0), "origin_s": 0, "origin_ns": 0}),
+            extra,
+        )
         fu = PTP.message("ptp_follow_up")
         v = {**self.header(0x8, 44, self.seq, 2), "origin_s": t1 // 1_000_000_000, "origin_ns": t1 % 1_000_000_000}
         self._send(self.gen, "ptp_general", I.encode(PTP, fu, v))
@@ -549,8 +556,14 @@ class Result:
 
 
 class Bench:
-    def __init__(self, workdir: Path, plan: str | None, faults: list[Fault] | None = None, seed: int = 7,
-                 nodes: tuple[int, ...] = (1, 2)) -> None:
+    def __init__(
+        self,
+        workdir: Path,
+        plan: str | None,
+        faults: list[Fault] | None = None,
+        seed: int = 7,
+        nodes: tuple[int, ...] = (1, 2),
+    ) -> None:
         self.workdir = workdir
         workdir.mkdir(parents=True, exist_ok=True)
         self.plan = plan
@@ -558,7 +571,10 @@ class Bench:
         self.seed = seed
         self.rng = random.Random(seed)
         self.truth = TrueTime()
-        self.ports = {k: free_port() for k in ("pps", "can", "can_peer", "ptp_event", "ptp_general", "ptp_master_event", "tlm", "diag")}
+        self.ports = {
+            k: free_port()
+            for k in ("pps", "can", "can_peer", "ptp_event", "ptp_general", "ptp_master_event", "tlm", "diag")
+        }
         self.nodes = nodes
         self.t0 = time.monotonic()
 
@@ -575,13 +591,32 @@ class Bench:
         status = self.workdir / "status.json"
         args = [
             str(BUILD / "daud"),
-            "--imu-tty", imu.path, "--gnss-tty", gnss.path,
-            "--pps-port", str(self.ports["pps"]),
-            "--can-port", str(self.ports["can"]), "--can-peer", f"127.0.0.1:{self.ports['can_peer']}",
-            "--ptp-event-port", str(self.ports["ptp_event"]), "--ptp-general-port", str(self.ports["ptp_general"]),
-            "--ptp-master", f"127.0.0.1:{self.ports['ptp_master_event']}",
-            "--tlm-dest", f"127.0.0.1:{self.ports['tlm']}", "--diag-port", str(self.ports["diag"]),
-            "--record", str(recording), "--status", str(status), "--run-ms", str(int(seconds * 1000)),
+            "--imu-tty",
+            imu.path,
+            "--gnss-tty",
+            gnss.path,
+            "--pps-port",
+            str(self.ports["pps"]),
+            "--can-port",
+            str(self.ports["can"]),
+            "--can-peer",
+            f"127.0.0.1:{self.ports['can_peer']}",
+            "--ptp-event-port",
+            str(self.ports["ptp_event"]),
+            "--ptp-general-port",
+            str(self.ports["ptp_general"]),
+            "--ptp-master",
+            f"127.0.0.1:{self.ports['ptp_master_event']}",
+            "--tlm-dest",
+            f"127.0.0.1:{self.ports['tlm']}",
+            "--diag-port",
+            str(self.ports["diag"]),
+            "--record",
+            str(recording),
+            "--status",
+            str(status),
+            "--run-ms",
+            str(int(seconds * 1000)),
         ]
         if self.plan is not None:
             args += ["--plan", str(plan_path)]

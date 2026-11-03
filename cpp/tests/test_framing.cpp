@@ -62,6 +62,22 @@ TEST(Framing, ASyncWordInsideCorruptDataDoesNotHideTheNextFrame) {
   EXPECT_EQ(frames[0][0], 9);
 }
 
+TEST(Framing, ATruncatedFrameDoesNotTakeTheNextOneWithIt) {
+  IQK_VERIFIES("SRS-011");
+  // A frame that lost bytes on the line: its length field promises 33 payload bytes that never come, so the
+  // next frame's first bytes complete it and its CRC fails. The next frame must still be delivered.
+  auto cut = iqk_test::imu_frame(iqk_test::imu_sample(1, 1));
+  cut.resize(14);
+  const auto good = iqk_test::imu_frame(iqk_test::imu_sample(2, 2));
+  std::vector<std::uint8_t> s = cut;
+  s.insert(s.end(), good.begin(), good.end());
+  Deframer d{33};
+  const auto frames = feed_all(d, s, 5);
+  ASSERT_EQ(frames.size(), 1U);
+  EXPECT_EQ(frames[0][0], 2);
+  EXPECT_EQ(d.stats().crc_errors, 1U);
+}
+
 TEST(Framing, GarbageBeforeAFrameIsDiscarded) {
   IQK_VERIFIES("SRS-011");
   std::vector<std::uint8_t> s = {0x00, 0xA5, 0x13, 0x5A, 0xA5};

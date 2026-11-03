@@ -13,7 +13,8 @@ constexpr std::array<std::uint16_t, 256> make16() {
   for (std::uint32_t i = 0; i < 256; ++i) {
     std::uint16_t c = static_cast<std::uint16_t>(i << 8U);
     for (int k = 0; k < 8; ++k) {
-      c = static_cast<std::uint16_t>((c & 0x8000U) != 0U ? (c << 1U) ^ 0x1021U : (c << 1U));
+      const std::uint32_t shifted = static_cast<std::uint32_t>(c) << 1U;
+      c = static_cast<std::uint16_t>((c & 0x8000U) != 0U ? (shifted ^ 0x1021U) : shifted);
     }
     t[i] = c;
   }

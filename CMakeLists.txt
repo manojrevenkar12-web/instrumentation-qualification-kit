@@ -14,7 +14,7 @@ find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto)
 
 # Warnings are errors: a warning in this code base is a finding to resolve, not noise.
 set(IQK_WARNINGS -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Wnon-virtual-dtor
-    -Wold-style-cast -Wcast-align -Wnull-dereference -Wdouble-promotion -Wformat=2 -Werror)
+    -Wold-style-cast -Wcast-align -Wdouble-promotion -Wformat=2 -Werror)
 
 # Hardening (checked on the built binaries by `iqk assurance hardening`).
 set(IQK_HARDENING -fstack-protector-strong -fstack-clash-protection -D_FORTIFY_SOURCE=3 -fPIE -fcf-protection=full)

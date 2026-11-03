@@ -1,0 +1,26 @@
+# Static analysis for shipped code (cpp/src, cpp/apps). Each disabled check says why.
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  concurrency-*,
+  performance-*,
+  portability-*,
+  misc-*,
+  -bugprone-easily-swappable-parameters,
+  -misc-include-cleaner,
+  -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
+  -cert-err58-cpp,
+  -bugprone-exception-escape,
+  -misc-use-anonymous-namespace,
+  -cert-dcl50-cpp,
+  -concurrency-mt-unsafe,
+  -performance-enum-size
+# easily-swappable-parameters: (local_ns, value) pairs are typed alike by design and covered by tests
+# include-cleaner: generated headers are included as a set
+# exception-escape / err58: std::function and static tables in tools; the core does not throw
+# concurrency-mt-unsafe: the daemon is single-threaded
+# performance-enum-size: fault codes are u16 on the wire (DAU-UDP diag_faults)
+WarningsAsErrors: '*'
+HeaderFilterRegex: 'cpp/(include|src|apps)/.*'

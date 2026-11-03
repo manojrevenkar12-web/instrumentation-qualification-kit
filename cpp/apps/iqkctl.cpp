@@ -50,8 +50,10 @@ bool unhex(std::string_view s, std::vector<std::uint8_t>& out) {
   }
   out.clear();
   for (std::size_t i = 0; i < s.size(); i += 2) {
-    unsigned v = 0;
-    if (std::sscanf(std::string{s.substr(i, 2)}.c_str(), "%2x", &v) != 1) {
+    const std::string byte{s.substr(i, 2)};
+    char* end = nullptr;
+    const unsigned long v = std::strtoul(byte.c_str(), &end, 16);
+    if (end != byte.c_str() + 2) {
       return false;
     }
     out.push_back(static_cast<std::uint8_t>(v));
@@ -83,7 +85,7 @@ int validate(const std::string& path) {
   const std::string text = slurp(path);
   std::vector<iqk::plan::Finding> f;
   const auto p = iqk::plan::parse(text, f);
-  bool ok = p.has_value() && iqk::plan::validate(*p, f);
+  const bool ok = p.has_value() && iqk::plan::validate(*p, f);
   for (const auto& x : f) {
     std::cout << R"({"rule":")" << x.rule << R"(","line":)" << x.line << R"(,"detail":")" << json_escape(x.detail)
               << "\"}\n";
@@ -163,7 +165,7 @@ int replay(const std::string& path) {
     off += len;
     if (port == 0xFC && len == 8) {  // the unit's PTP clock identity, first record of every recording
       std::uint64_t id = 0;
-      for (std::size_t i = 0; i < 8; ++i) {
+      for (std::size_t i = 0; i < b.size(); ++i) {  // len == 8
         id |= static_cast<std::uint64_t>(b[i]) << (8U * i);
       }
       unit.emplace(id);
