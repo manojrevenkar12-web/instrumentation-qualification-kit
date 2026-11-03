@@ -1,0 +1,46 @@
+# Settings of the data acquisition unit (DAU). A configuration item: changing a value changes the release
+# configuration hash, and the requirements that cite the value are re-verified (see requirements/srs.yaml).
+# cpp/gen/iqk/config.hpp is generated from this file.
+unit:
+  sw_version: [1, 4, 0]
+  hw_id: 0x0F710001            # the hardware this software is built for; update packages must match
+
+timing:
+  sources: [ptp, gnss]         # priority order
+  lock_threshold_ns: 100000    # |offset| below this counts towards lock (software time stamps; 1 us with hardware stamping)
+  lock_count: 8                # consecutive measurements inside the threshold to declare lock
+  unlock_threshold_ns: 500000  # one measurement beyond this drops lock (offsets above 1 ms are stepped)
+  holdover_start_ms: 2500      # no valid measurement for this long: holdover
+  holdover_max_ms: 300000      # holdover longer than this: free-running (quality 0)
+  max_freq_adj_ppb: 200000     # servo output clamp
+  servo_kp: 0.7
+  servo_ki: 0.3
+  ptp_outlier_factor: 4        # a path delay more than this times the running minimum is discarded
+  ptp_min_window: 16           # measurements in the running-minimum window
+  gnss_max_acc_ns: 200         # time pulses less accurate than this are not used
+  gnss_max_msg_delay_ms: 900   # a time message more than this after its PPS edge is stale
+  switch_hold_ms: 5000         # a better source must be good this long before switching to it
+
+imu:
+  latency_window: 400          # samples in the arrival-time minimum filter (1 s at 400 Hz)
+  max_gap_samples: 4           # a gap longer than this is logged as a fault
+
+aam:
+  heartbeat_timeout_ms: 3500   # 3.5 heartbeat periods without a heartbeat: node lost
+  overrange_raw: 32767
+
+plan:
+  max_channels: 48
+  max_can_bus_load: 0.60       # worst-case, with bit stuffing
+  telemetry_link_bps: 2000000  # the telemetry radio
+  frame_period_ms: 10
+  reg_timeout_ms: 50
+  reg_retries: 3
+  allowed_imu_rates_hz: [400, 200, 100, 50]
+
+update:
+  max_trial_boots: 3           # a pending image not confirmed after this many boots is rolled back
+  max_image_bytes: 67108864
+
+diag:
+  fault_log_capacity: 256

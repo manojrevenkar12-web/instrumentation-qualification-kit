@@ -1,0 +1,43 @@
+# Interface control document: inertial measurement unit (IMU), serial.
+# This file is the single source: the C++ and Python codecs and docs/icd/imu.md are generated from it.
+icd: IMU-SER
+title: Inertial measurement unit, RS-422 serial
+version: 1.2.0
+byte_order: little
+transport:
+  kind: serial
+  baud: 921600
+  framing: sync16      # A5 5A | id u8 | len u8 | payload | crc16 (CCITT-FALSE over id, len, payload)
+messages:
+  - name: imu_sample
+    id: 0x01
+    direction: device_to_host
+    rate_hz: 400
+    description: One inertial sample, taken at the device's sample instant t_us.
+    fields:
+      - {name: seq, type: u16, description: Sample counter, wraps at 65535.}
+      - {name: t_us, type: u32, unit: us, description: Device time of the sample, wraps.}
+      - {name: gyro_x, type: i32, scale: 1.0e-6, unit: rad/s, range: [-8.727, 8.727]}
+      - {name: gyro_y, type: i32, scale: 1.0e-6, unit: rad/s, range: [-8.727, 8.727]}
+      - {name: gyro_z, type: i32, scale: 1.0e-6, unit: rad/s, range: [-8.727, 8.727]}
+      - {name: accel_x, type: i32, scale: 1.0e-5, unit: m/s2, range: [-156.9, 156.9]}
+      - {name: accel_y, type: i32, scale: 1.0e-5, unit: m/s2, range: [-156.9, 156.9]}
+      - {name: accel_z, type: i32, scale: 1.0e-5, unit: m/s2, range: [-156.9, 156.9]}
+      - {name: temp, type: i16, scale: 0.01, unit: degC, range: [-40, 85]}
+      - name: status
+        type: u8
+        bits: {gyro_ok: 0, accel_ok: 1, temp_ok: 2, saturated: 3}
+  - name: imu_bit_result
+    id: 0x02
+    direction: device_to_host
+    description: Result of a commanded self-test. result 0 = pass.
+    fields:
+      - {name: result, type: u8}
+      - {name: code, type: u16, description: Failing sub-test, 0 when result is 0.}
+  - name: imu_command
+    id: 0x10
+    direction: host_to_device
+    description: "Commands: 1 start streaming, 2 stop streaming, 3 run self-test."
+    fields:
+      - {name: cmd, type: u8, range: [1, 3]}
+      - {name: arg, type: u16}

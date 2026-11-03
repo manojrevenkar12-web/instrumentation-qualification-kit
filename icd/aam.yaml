@@ -1,0 +1,71 @@
+# Interface control document: analog acquisition module (AAM), CAN.
+# CANopen-style: heartbeat, multiplexed process data, and an expedited register protocol.
+icd: AAM-CAN
+title: Analog acquisition module, classic CAN 500 kbit/s
+version: 2.0.1
+byte_order: little
+transport:
+  kind: can
+  bitrate: 500000
+  id_bits: 11
+  # Identifiers are base + node id (1..32).
+channels: 12          # analog inputs per module
+channel_groups: 4     # data frames carry three channels each, selected by mux
+base_rate_hz: 1000    # a channel's rate is base_rate_hz / divisor
+divisors: [1, 2, 5, 10, 20, 50, 100]
+ranges_mv: [100, 1000, 5000, 10000]   # range code n selects ranges_mv[n], full scale +/-
+filters: [none, lp_100hz, lp_10hz]
+registers:
+  - {index: 0x2000, sub: 1, name: ch_enable, per_channel: true, range: [0, 1]}
+  - {index: 0x2000, sub: 2, name: ch_range_code, per_channel: true, range: [0, 3]}
+  - {index: 0x2000, sub: 3, name: ch_divisor, per_channel: true, values_from: divisors}
+  - {index: 0x2000, sub: 4, name: ch_filter, per_channel: true, range: [0, 2]}
+  - {index: 0x1F00, sub: 0, name: commit, description: Writing 1 applies the configuration and computes its CRC.}
+  - {index: 0x1F01, sub: 0, name: config_crc, description: "CRC-32 (IEEE) of the applied configuration, read only: for channels 0..11 in order, enable, range code, divisor and filter, each as u32 little-endian."}
+messages:
+  - name: aam_heartbeat
+    id: 0x700
+    per_node: true
+    direction: device_to_host
+    rate_hz: 1
+    fields:
+      - {name: state, type: u8, range: [0, 3], description: "0 boot, 1 pre-operational, 2 operational, 3 fault."}
+      - {name: counter, type: u8}
+      - name: errors
+        type: u16
+        bits: {adc_fault: 0, overrange: 1, cold_junction: 2, config_crc: 3, bus_warning: 4}
+  - name: aam_data
+    id: 0x180
+    per_node: true
+    direction: device_to_host
+    description: Three channels of group mux. Raw counts; +/-32767 is +/- the channel's configured range.
+    fields:
+      - {name: mux, type: u8, range: [0, 3]}
+      - {name: counter, type: u8, description: Increments per frame per group, wraps.}
+      - {name: ch_a, type: i16}
+      - {name: ch_b, type: i16}
+      - {name: ch_c, type: i16}
+  - name: aam_reg_request
+    id: 0x600
+    per_node: true
+    direction: host_to_device
+    fields:
+      - {name: cmd, type: u8, description: "0x23 write, 0x40 read."}
+      - {name: index, type: u16}
+      - {name: sub, type: u8}
+      - {name: value, type: u32}
+  - name: aam_reg_response
+    id: 0x580
+    per_node: true
+    direction: device_to_host
+    fields:
+      - {name: cmd, type: u8, description: "0x60 write acknowledged, 0x43 read value, 0x80 abort (value is the abort code)."}
+      - {name: index, type: u16}
+      - {name: sub, type: u8}
+      - {name: value, type: u32}
+  - name: aam_nmt
+    id: 0x000
+    direction: host_to_device
+    fields:
+      - {name: cmd, type: u8, description: "0x01 start, 0x02 stop, 0x80 pre-operational, 0x81 reset."}
+      - {name: node, type: u8}

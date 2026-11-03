@@ -1,0 +1,25 @@
+# Interface control document: GNSS timing receiver, serial plus a PPS line.
+icd: GNSS-SER
+title: GNSS timing receiver, serial time messages and pulse per second
+version: 1.0.3
+byte_order: little
+transport:
+  kind: serial
+  baud: 115200
+  framing: sync16
+  pps: The rising edge marks the start of a GPS second; the time_pulse message that follows names that second.
+messages:
+  - name: time_pulse
+    id: 0x20
+    direction: device_to_host
+    rate_hz: 1
+    description: Names the second that started at the preceding PPS edge. Arrives within 500 ms of the edge.
+    fields:
+      - {name: week, type: u16, description: GPS week number.}
+      - {name: tow_ms, type: u32, unit: ms, range: [0, 604799999], description: Time of week at the edge.}
+      - {name: leap_s, type: i8, unit: s, range: [0, 60], description: GPS minus UTC.}
+      - {name: fix, type: u8, range: [0, 3], description: "0 none, 2 2D, 3 3D."}
+      - name: flags
+        type: u8
+        bits: {time_valid: 0, leap_valid: 1, raim_ok: 2}
+      - {name: acc_ns, type: u32, unit: ns, description: Estimated time accuracy of the edge.}

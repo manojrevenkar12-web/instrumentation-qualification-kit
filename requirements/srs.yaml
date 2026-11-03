@@ -1,0 +1,321 @@
+# Software requirements of the data acquisition unit (DAU).
+#
+# method: test (requirements-based test), analysis (computed evidence), inspection (a check of an artifact).
+# cites:  the interface documents and configuration values the requirement depends on. Changing one of them
+#         puts the requirement back to "to be re-verified" until its tests run on the new configuration.
+# Tests declare what they verify (IQK_VERIFIES in C++, @pytest.mark.verifies in Python). A link counts as
+# evidence only when the test fails on the requirement's mutants (qual/mutants.yaml).
+spec: DAU-SRS
+version: 1.4.0
+requirements:
+  # --- interfaces ------------------------------------------------------------------------------------------
+  - id: SRS-001
+    title: Wire formats follow the ICDs
+    text: Every message is encoded and decoded with the field order, sizes and byte order of its ICD.
+    method: test
+    cites: [icd/imu.yaml, icd/aam.yaml, icd/gnss.yaml, icd/ptp.yaml, icd/tlm.yaml]
+  - id: SRS-002
+    title: Lengths are exact
+    text: A payload whose length is not the one its ICD defines (including an array whose count does not match) is rejected.
+    method: test
+    cites: [icd/imu.yaml, icd/aam.yaml, icd/tlm.yaml]
+  - id: SRS-003
+    title: Out-of-range values are not used
+    text: Values outside their ICD range are rejected and counted before any reading is produced from them.
+    method: test
+    cites: [icd/imu.yaml, icd/gnss.yaml, icd/aam.yaml]
+
+  # --- serial links ----------------------------------------------------------------------------------------
+  - id: SRS-010
+    title: Frames survive any chunking
+    text: The serial deframer delivers every valid frame whatever the size and boundaries of the reads.
+    method: test
+    cites: [icd/imu.yaml]
+  - id: SRS-011
+    title: Resynchronisation after corruption
+    text: A corrupted frame costs at most that frame; the next valid frame is delivered, including when the corrupt bytes contain a sync word.
+    method: test
+    cites: [icd/imu.yaml, icd/gnss.yaml]
+  - id: SRS-012
+    title: CRC errors are counted
+    text: Each frame with a CRC error is counted and reported in diagnostics.
+    method: test
+    cites: [icd/imu.yaml]
+  - id: SRS-013
+    title: Impossible lengths do not stall a link
+    text: A length longer than the device can send is treated as corruption at once.
+    method: test
+    cites: [icd/imu.yaml]
+
+  # --- IMU -------------------------------------------------------------------------------------------------
+  - id: SRS-020
+    title: IMU samples carry acquisition time
+    text: IMU samples are stamped with the time they were taken (device time mapped to local time by a running minimum of arrival minus device time), so transport jitter does not move time stamps by more than 30 us.
+    method: test
+    cites: [config/unit.yaml#imu.latency_window]
+  - id: SRS-021
+    title: Lost IMU samples are counted
+    text: Gaps in the 16-bit sample counter are counted across its wrap; gaps longer than imu.max_gap_samples are logged as faults.
+    method: test
+    cites: [config/unit.yaml#imu.max_gap_samples]
+  - id: SRS-022
+    title: Device time wraps
+    text: The 32-bit microsecond device time is unwrapped so time stamps stay continuous across its wrap.
+    method: test
+    cites: [icd/imu.yaml]
+  - id: SRS-023
+    title: IMU start-up and supervision
+    text: The unit commands an IMU self-test and then streaming, repeats both every second while no samples arrive, logs a lost IMU, and reports the IMU healthy only after a passed self-test with samples arriving.
+    method: test
+    cites: [icd/imu.yaml]
+
+  # --- acquisition modules ---------------------------------------------------------------------------------
+  - id: SRS-030
+    title: Module supervision
+    text: A module without heartbeat for aam.heartbeat_timeout_ms is reported lost, logged once, and fails the module built-in test.
+    method: test
+    cites: [config/unit.yaml#aam.heartbeat_timeout_ms]
+  - id: SRS-031
+    title: Lost data frames are detected per group
+    text: Each data group's frame counter is checked separately; a missing frame is counted and logged.
+    method: test
+    cites: [icd/aam.yaml]
+  - id: SRS-032
+    title: Engineering values and over-range
+    text: Counts are converted with the channel's range, scale and offset; a count at full scale is flagged over-range.
+    method: test
+    cites: [icd/aam.yaml, config/unit.yaml#aam.overrange_raw]
+
+  # --- measurement plan ------------------------------------------------------------------------------------
+  - id: SRS-040
+    title: Plans are parsed strictly
+    text: Unknown statements or keys, duplicate keys, malformed numbers and missing required keys reject the plan (PLN-01, PLN-02).
+    method: test
+    cites: []
+  - id: SRS-041
+    title: Channel names and count
+    text: Channel names are unique and 1-16 of a-z, 0-9, _; a plan has 1..plan.max_channels channels (PLN-03, PLN-04).
+    method: test
+    cites: [config/unit.yaml#plan.max_channels]
+  - id: SRS-042
+    title: Sources exist
+    text: Every channel names a module 1..32 and input that exists, or an IMU field that exists (PLN-05).
+    method: test
+    cites: [icd/aam.yaml, icd/imu.yaml]
+  - id: SRS-043
+    title: Rates are achievable
+    text: Module rates are the base rate over an allowed divisor; IMU rates are one of plan.allowed_imu_rates_hz (PLN-06).
+    method: test
+    cites: [icd/aam.yaml, config/unit.yaml#plan.allowed_imu_rates_hz]
+  - id: SRS-044
+    title: Ranges and filters exist
+    text: Every range and filter is one the module offers (PLN-07).
+    method: test
+    cites: [icd/aam.yaml]
+  - id: SRS-045
+    title: Inputs in one data frame share a rate
+    text: Inputs carried in the same data frame must be planned at the same rate (PLN-08).
+    method: test
+    cites: [icd/aam.yaml]
+  - id: SRS-046
+    title: An input is used once
+    text: No physical input or IMU field appears in two channels (PLN-09).
+    method: test
+    cites: []
+  - id: SRS-047
+    title: Alarm limits are measurable
+    text: Alarm limits are ordered and inside what the channel can measure given its range, scale and offset; scale is not zero (PLN-10, PLN-13).
+    method: test
+    cites: [icd/imu.yaml]
+  - id: SRS-048
+    title: CAN bus load
+    text: The plan's worst-case CAN bus load, with bit stuffing, does not exceed plan.max_can_bus_load (PLN-11).
+    method: test
+    cites: [icd/aam.yaml, config/unit.yaml#plan.max_can_bus_load]
+  - id: SRS-049
+    title: Telemetry link budget
+    text: The plan's telemetry bit rate, with packet and network overhead, does not exceed plan.telemetry_link_bps (PLN-12).
+    method: test
+    cites: [icd/tlm.yaml, config/unit.yaml#plan.telemetry_link_bps, config/unit.yaml#plan.frame_period_ms]
+
+  # --- plan loading ----------------------------------------------------------------------------------------
+  - id: SRS-050
+    title: Register writes are acknowledged
+    text: Every register request is answered within plan.reg_timeout_ms or retried, at most plan.reg_retries times; then the load fails.
+    method: test
+    cites: [config/unit.yaml#plan.reg_timeout_ms, config/unit.yaml#plan.reg_retries]
+  - id: SRS-051
+    title: Aborts fail the load
+    text: A module abort fails the load at once with the module's abort code.
+    method: test
+    cites: [icd/aam.yaml]
+  - id: SRS-052
+    title: Configuration is read back
+    text: After commit every written register is read back and compared; a mismatch fails the load. All inputs of a used module are written.
+    method: test
+    cites: [icd/aam.yaml]
+  - id: SRS-053
+    title: Module configuration CRC
+    text: Each module's configuration CRC must equal the CRC computed from the plan; otherwise the load fails and is logged.
+    method: test
+    cites: [icd/aam.yaml]
+  - id: SRS-054
+    title: Telemetry only under an armed plan
+    text: No telemetry is sent until a plan is loaded and verified; every packet carries the CRC of the plan in force; a rejected plan leaves the armed one in force.
+    method: test
+    cites: [icd/tlm.yaml]
+  - id: SRS-055
+    title: Late answers are not misattributed
+    text: An answer to an earlier request is never taken as the answer to the current one.
+    method: test
+    cites: [icd/aam.yaml]
+
+  # --- time ------------------------------------------------------------------------------------------------
+  - id: SRS-060
+    title: PTP exchange
+    text: Offset and path delay are computed from the two-step end-to-end exchange; Follow_Up and Delay_Resp are matched by sequence id and requester identity; other domains and versions are ignored.
+    method: test
+    cites: [icd/ptp.yaml]
+  - id: SRS-061
+    title: Delay outliers
+    text: An exchange whose path delay exceeds timing.ptp_outlier_factor times the running minimum does not adjust the clock.
+    method: test
+    cites: [config/unit.yaml#timing.ptp_outlier_factor, config/unit.yaml#timing.ptp_min_window]
+  - id: SRS-062
+    title: GNSS time is checked
+    text: A GNSS time message is used only with valid time and leap flags, a 2D or 3D fix, accuracy within timing.gnss_max_acc_ns, and within timing.gnss_max_msg_delay_ms of its PPS edge; each edge is used once.
+    method: test
+    cites: [config/unit.yaml#timing.gnss_max_acc_ns, config/unit.yaml#timing.gnss_max_msg_delay_ms]
+  - id: SRS-063
+    title: Slew, do not step
+    text: Offsets up to 1 ms are removed by adjusting the clock rate, so time never runs backwards; larger offsets step the clock and are logged.
+    method: test
+    cites: []
+  - id: SRS-064
+    title: Lock
+    text: Lock is declared after timing.lock_count consecutive measurements within timing.lock_threshold_ns and lost on one beyond timing.unlock_threshold_ns.
+    method: test
+    cites: [config/unit.yaml#timing.lock_count, config/unit.yaml#timing.lock_threshold_ns, config/unit.yaml#timing.unlock_threshold_ns]
+  - id: SRS-065
+    title: Holdover and free-running
+    text: Without measurements for timing.holdover_start_ms the unit enters holdover at the learned rate (quality 1); after timing.holdover_max_ms it is free-running (quality 0).
+    method: test
+    cites: [config/unit.yaml#timing.holdover_start_ms, config/unit.yaml#timing.holdover_max_ms]
+  - id: SRS-066
+    title: Source selection
+    text: Sources are used in timing.sources priority; the unit fails over at once when the active source is lost and returns to a better one only after it has been good for timing.switch_hold_ms.
+    method: test
+    cites: [config/unit.yaml#timing.sources, config/unit.yaml#timing.switch_hold_ms]
+  - id: SRS-067
+    title: Time-stamp accuracy end to end
+    text: While locked to PTP on the bench, 99 % of module samples are stamped within 1 ms of true time.
+    method: test
+    cites: [config/unit.yaml#timing]
+
+  # --- telemetry -------------------------------------------------------------------------------------------
+  - id: SRS-070
+    title: Packet integrity
+    text: Every telemetry packet ends with a CRC-32 over the packet and carries a sequence number one above the previous one.
+    method: test
+    cites: [icd/tlm.yaml]
+  - id: SRS-071
+    title: Sample order and offsets
+    text: Samples in a packet are in acquisition order, with non-negative offsets from the packet time; every sample sent is counted.
+    method: test
+    cites: [icd/tlm.yaml]
+  - id: SRS-072
+    title: Alarm flags
+    text: A sample below its alarm low limit carries alarm_low, above its high limit alarm_high.
+    method: test
+    cites: [icd/tlm.yaml]
+  - id: SRS-073
+    title: IMU decimation
+    text: IMU channels are decimated from 400 Hz to their planned rate.
+    method: test
+    cites: [icd/imu.yaml]
+
+  # --- diagnostics -----------------------------------------------------------------------------------------
+  - id: SRS-080
+    title: Status
+    text: A status request returns uptime, software version, boot slot, built-in test, time state and source, offset, link counters and the plan CRC.
+    method: test
+    cites: [icd/tlm.yaml]
+  - id: SRS-081
+    title: Bounded fault log
+    text: The fault log holds diag.fault_log_capacity records; repeats within one second are folded; when full the oldest is overwritten and counted.
+    method: test
+    cites: [config/unit.yaml#diag.fault_log_capacity]
+  - id: SRS-082
+    title: Malformed requests
+    text: A malformed diagnostic request is logged and not answered.
+    method: test
+    cites: [icd/tlm.yaml]
+
+  # --- software update -------------------------------------------------------------------------------------
+  - id: SRS-090
+    title: Signed packages only
+    text: A package is accepted only if its Ed25519 signature over the header verifies against the release key and the image matches the signed hash; nothing is written otherwise.
+    method: test
+    cites: []
+  - id: SRS-091
+    title: Hardware match
+    text: A package built for other hardware (unit.hw_id) is refused.
+    method: test
+    cites: [config/unit.yaml#unit.hw_id]
+  - id: SRS-092
+    title: Anti-rollback
+    text: A package below the security floor is refused; the floor rises only when a new image is confirmed.
+    method: test
+    cites: []
+  - id: SRS-093
+    title: Inactive slot only
+    text: Install writes only the inactive slot and reads it back before marking it pending.
+    method: test
+    cites: []
+  - id: SRS-094
+    title: Trial boot
+    text: A pending image gets update.max_trial_boots boots; unless confirmed by the application it is rolled back.
+    method: test
+    cites: [config/unit.yaml#update.max_trial_boots]
+  - id: SRS-095
+    title: Verified boot
+    text: The boot selector verifies the image it is about to boot; a damaged active image falls back to a verified other slot, and with none the unit does not boot.
+    method: test
+    cites: []
+  - id: SRS-096
+    title: Power loss during update
+    text: Losing power at any write leaves a bootable, verified image.
+    method: test
+    cites: []
+
+  # --- determinism and assurance ---------------------------------------------------------------------------
+  - id: SRS-100
+    title: Exact replay
+    text: Replaying a recording of the unit's inputs reproduces its telemetry byte for byte.
+    method: test
+    cites: []
+  - id: SRS-101
+    title: Fault campaign
+    text: Under the bench fault campaign (bit errors, dropped and out-of-range samples, a lost module, a GNSS outage, PTP outage and jitter, module register faults) the unit keeps running, reports each fault, and sends no packet with a bad CRC.
+    method: test
+    cites: [config/unit.yaml]
+  - id: SRS-110
+    title: Reproducible build
+    text: Two builds of the same sources with the same toolchain in different directories produce identical binaries.
+    method: analysis
+    cites: [CMakeLists.txt]
+  - id: SRS-111
+    title: Hardened binaries
+    text: Shipped binaries are position independent, with full RELRO, a non-executable stack, stack protection and CET.
+    method: inspection
+    cites: [CMakeLists.txt]
+  - id: SRS-112
+    title: Static analysis clean
+    text: clang-tidy and cppcheck report no findings in shipped code; sanitizer builds pass every unit test.
+    method: analysis
+    cites: [.clang-tidy]
+  - id: SRS-113
+    title: Release evidence
+    text: Every release carries its SBOM, the test evidence, the traceability matrix and a configuration manifest, all hashed and signed.
+    method: inspection
+    cites: []

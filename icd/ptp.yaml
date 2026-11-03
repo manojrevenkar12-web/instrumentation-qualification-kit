@@ -1,0 +1,56 @@
+# Interface control document: precision time protocol, IEEE 1588-2019 subset over UDP/IPv4.
+# Two-step end-to-end delay mechanism. Big-endian, as on the wire.
+icd: PTP-UDP
+title: IEEE 1588 precision time protocol, two-step, end-to-end
+version: 1.1.0
+byte_order: big
+transport:
+  kind: udp
+  event_port: 319      # overridable for unprivileged emulation
+  general_port: 320
+  domain: 0
+header:
+  # 34-byte common header (IEEE 1588-2019 13.3)
+  - {name: type_sdo, type: u8, description: "majorSdoId (high nibble) and messageType (low nibble): 0 Sync, 1 Delay_Req, 8 Follow_Up, 9 Delay_Resp."}
+  - {name: version, type: u8, description: "versionPTP 2 (low nibble)."}
+  - {name: length, type: u16}
+  - {name: domain, type: u8}
+  - {name: minor_sdo, type: u8}
+  - {name: flags, type: u16, bits: {two_step: 9}}
+  - {name: correction, type: i64, description: Scaled nanoseconds (ns * 2^16).}
+  - {name: type_specific, type: u32}
+  - {name: clock_identity, type: u64}
+  - {name: port_number, type: u16}
+  - {name: sequence_id, type: u16}
+  - {name: control, type: u8}
+  - {name: log_interval, type: i8}
+messages:
+  - name: ptp_sync
+    id: 0x0
+    direction: master_to_slave
+    rate_hz: 8
+    fields:
+      - {name: origin_s, type: u48}
+      - {name: origin_ns, type: u32, range: [0, 999999999]}
+  - name: ptp_delay_req
+    id: 0x1
+    direction: slave_to_master
+    fields:
+      - {name: origin_s, type: u48}
+      - {name: origin_ns, type: u32, range: [0, 999999999]}
+  - name: ptp_follow_up
+    id: 0x8
+    direction: master_to_slave
+    description: Carries t1, the precise transmit time of the Sync with the same sequence_id.
+    fields:
+      - {name: origin_s, type: u48}
+      - {name: origin_ns, type: u32, range: [0, 999999999]}
+  - name: ptp_delay_resp
+    id: 0x9
+    direction: master_to_slave
+    description: Carries t4, when the master received the Delay_Req with the same sequence_id.
+    fields:
+      - {name: receive_s, type: u48}
+      - {name: receive_ns, type: u32, range: [0, 999999999]}
+      - {name: req_clock_identity, type: u64}
+      - {name: req_port_number, type: u16}
