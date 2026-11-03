@@ -160,6 +160,16 @@ class AamDriver {
     }
   }
 
+  // Starts supervising a module the plan uses: from now on it must send heartbeats, even if it never has.
+  void expect(int node, std::int64_t now) noexcept {
+    if (node >= 1 && node <= kMaxNodes) {
+      Node& n = nodes_[static_cast<std::size_t>(node - 1)];
+      if (n.last_hb == INT64_MIN) {
+        n.last_hb = now;
+      }
+    }
+  }
+
   // Heartbeat supervision; logs each loss once.
   void supervise(std::int64_t now, FaultLog& log) noexcept;
   [[nodiscard]] bool alive(int node, std::int64_t now) const noexcept;

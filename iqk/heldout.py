@@ -26,8 +26,11 @@ def _first_run(name: str) -> Path:
 
 
 def _decode(icd: str, message: str, payload_hex: str) -> dict | None:
-    p = subprocess.run([str(build_dir() / "iqkctl"), "codec", "decode", icd, message, payload_hex.replace(" ", "")],
-                       capture_output=True, text=True)
+    p = subprocess.run(
+        [str(build_dir() / "iqkctl"), "codec", "decode", icd, message, payload_hex.replace(" ", "")],
+        capture_output=True,
+        text=True,
+    )
     if p.returncode != 0:
         return None
     out: dict = {}
@@ -91,8 +94,13 @@ def _plan(path: Path) -> dict:
             detail = f"refused, but with {sorted(rules)} instead of {sorted(want_rules)}"
         else:
             detail = ""
-    return {"name": path.name, "kind": "plan", "pass": ok, "detail": detail,
-            "refused_as_expected": (not accepted) == (not want_accept)}
+    return {
+        "name": path.name,
+        "kind": "plan",
+        "pass": ok,
+        "detail": detail,
+        "refused_as_expected": (not accepted) == (not want_accept),
+    }
 
 
 def run(name: str) -> dict:

@@ -1,0 +1,122 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build libgtest-dev libssl-dev
+      - name: Python
+        run: pip install pyyaml cryptography pytest hypothesis ruff
+      - name: Generated files are current
+        run: python3 -m iqk.cli icd check
+      - name: Lint
+        run: python3 -m ruff check iqk tests && python3 -m ruff format --check iqk tests
+      - name: Build (gcc, warnings are errors)
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo && ninja -C build
+      - name: Unit tests
+        run: ./build/iqk_tests --gtest_brief=1
+      - name: Python tests (codec parity, without the bench)
+        run: python3 -m pytest -q -m "not system" tests
+      - name: Hardening of the shipped binaries
+        run: python3 -m iqk.cli assurance hardening
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            build/daud
+            build/iqkctl
+            build/iqk_tests
+            build/compile_commands.json
+
+  clang-sanitizers:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build libgtest-dev libssl-dev clang
+      - run: pip install pyyaml
+      - name: Unit tests under ASan and UBSan (clang)
+        env: { CXX: clang++ }
+        run: python3 -m iqk.cli assurance sanitize
+
+  static-analysis:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build libgtest-dev libssl-dev clang-tidy cppcheck
+      - run: pip install pyyaml
+      - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - name: clang-tidy and cppcheck
+        run: python3 -m iqk.cli assurance static
+
+  reproducible-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build libssl-dev
+      - run: pip install pyyaml
+      - name: Two builds in different directories give identical binaries
+        run: python3 -m iqk.cli assurance repro
+
+  system-bench:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build libgtest-dev libssl-dev
+      - run: pip install pyyaml cryptography pytest hypothesis
+      - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo && ninja -C build
+      - name: The daemon against the SITL emulators (time accuracy, replay, fault campaign)
+        run: python3 -m pytest -q -m system tests
+
+  qualification:
+    runs-on: ubuntu-24.04
+    needs: [build-test]
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build libgtest-dev libssl-dev clang-tidy cppcheck clang
+      - run: pip install pyyaml cryptography pytest hypothesis
+      - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo && ninja -C build
+      - name: Test evidence (unit and system tests, with the requirements each claims)
+        run: python3 -m iqk.cli qual evidence
+      - name: Mutation proof of every traceability link
+        run: python3 -m iqk.cli qual mutate
+      - name: Assurance reports
+        run: |
+          python3 -m iqk.cli assurance hardening
+          python3 -m iqk.cli assurance static
+          python3 -m iqk.cli assurance sanitize
+          python3 -m iqk.cli assurance repro
+          python3 -m iqk.cli assurance sbom
+      - name: Traceability matrix and release gate
+        run: python3 -m iqk.cli qual matrix
+      - name: Release bundle, signed by the pipeline (an engineer signs separately)
+        run: python3 -m iqk.cli qual release
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qualification-evidence
+          path: |
+            reports/
+            docs/TRACEABILITY.md
+            docs/VERIFICATION_PLAN.md
+
+  web:
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: web } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npx biome ci src e2e
+      - run: npx tsc --noEmit -p .
+      - run: npx vitest run
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test

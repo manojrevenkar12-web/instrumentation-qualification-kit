@@ -144,6 +144,18 @@ TEST(Aam, AModuleWithoutHeartbeatIsLostOnce) {
   EXPECT_FALSE(d.alive(4, kS));  // never heard of
 }
 
+TEST(Aam, AModuleThePlanUsesIsSupervisedBeforeItsFirstHeartbeat) {
+  IQK_VERIFIES("SRS-030");
+  AamDriver d;
+  FaultLog log;
+  d.expect(5, kS);
+  d.supervise(kS + 3400 * kMs, log);
+  EXPECT_EQ(log.count(Fault::aam_lost), 0U);
+  d.supervise(kS + 3600 * kMs, log);
+  EXPECT_EQ(log.count(Fault::aam_lost), 1U);
+  EXPECT_FALSE(d.alive(5, kS + 3600 * kMs));
+}
+
 TEST(Aam, CountersArePerGroup) {
   IQK_VERIFIES("SRS-031");
   AamDriver d;

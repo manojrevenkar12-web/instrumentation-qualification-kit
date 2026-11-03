@@ -27,8 +27,24 @@ import yaml
 from ..icd import ROOT
 from ..qual import mutate
 
-REQUIREMENTS = ["SRS-011", "SRS-013", "SRS-021", "SRS-022", "SRS-030", "SRS-043", "SRS-045", "SRS-047", "SRS-048",
-                "SRS-050", "SRS-055", "SRS-062", "SRS-065", "SRS-081", "SRS-092", "SRS-094"]
+REQUIREMENTS = [
+    "SRS-011",
+    "SRS-013",
+    "SRS-021",
+    "SRS-022",
+    "SRS-030",
+    "SRS-043",
+    "SRS-045",
+    "SRS-047",
+    "SRS-048",
+    "SRS-050",
+    "SRS-055",
+    "SRS-062",
+    "SRS-065",
+    "SRS-081",
+    "SRS-092",
+    "SRS-094",
+]
 MODELS = ["haiku", "sonnet"]
 BUDGET_USD = 1.0
 TIMEOUT_S = 900
@@ -79,20 +95,58 @@ def _workspace(base: Path) -> Path:
     shutil.copytree(ROOT / "docs" / "icd", ws / "docs" / "icd")
     # A placeholder so the test binary links before the agent writes anything.
     (ws / "cpp" / "tests" / "agent_test.cpp").write_text('#include "support.hpp"\n')
-    subprocess.run(["cmake", "-S", str(ws), "-B", str(ws / "build"), "-G", "Ninja", "-DCMAKE_BUILD_TYPE=None",
-                    "-DCMAKE_CXX_FLAGS=-O1"], check=True, capture_output=True)
+    subprocess.run(
+        [
+            "cmake",
+            "-S",
+            str(ws),
+            "-B",
+            str(ws / "build"),
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=None",
+            "-DCMAKE_CXX_FLAGS=-O1",
+        ],
+        check=True,
+        capture_output=True,
+    )
     subprocess.run(["ninja", "-C", str(ws / "build"), "iqk_tests"], capture_output=True)
     return ws
 
 
 def _session(ws: Path, model: str, prompt: str, transcript: Path) -> dict:
-    allowed = ["Read", "Edit", "Write", "Glob", "Grep", "Bash(ninja -C build:*)", "Bash(./build/iqk_tests:*)",
-               "Bash(ls:*)"]
+    allowed = [
+        "Read",
+        "Edit",
+        "Write",
+        "Glob",
+        "Grep",
+        "Bash(ninja -C build:*)",
+        "Bash(./build/iqk_tests:*)",
+        "Bash(ls:*)",
+    ]
     # --restricted confines the file tools to the workspace: the session cannot read the project's own tests,
     # mutants or reports, which live outside it.
-    cmd = ["claude", "-p", "--restricted", "--model", model, "--output-format", "stream-json", "--verbose", "--permission-mode",
-           "dontAsk", "--max-budget-usd", str(BUDGET_USD), "--no-session-persistence", "--strict-mcp-config",
-           "--tools", "Read,Edit,Write,Glob,Grep,Bash", "--allowedTools", *allowed]
+    cmd = [
+        "claude",
+        "-p",
+        "--restricted",
+        "--model",
+        model,
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--permission-mode",
+        "dontAsk",
+        "--max-budget-usd",
+        str(BUDGET_USD),
+        "--no-session-persistence",
+        "--strict-mcp-config",
+        "--tools",
+        "Read,Edit,Write,Glob,Grep,Bash",
+        "--allowedTools",
+        *allowed,
+    ]
     env = {"HOME": os.environ["HOME"], "PATH": os.environ["PATH"]}
     t0 = time.monotonic()
     try:
@@ -131,8 +185,11 @@ def _evaluate(draft: Path, rid: str, work: Path) -> tuple[bool, bool, int, int, 
     shutil.copytree(ROOT / "cpp", ev / "cpp", ignore=shutil.ignore_patterns("test_*.cpp"))
     shutil.copy2(draft, ev / "cpp" / "tests" / "agent_test.cpp")
     b = ev / "build"
-    subprocess.run(["cmake", "-S", str(ev), "-B", str(b), "-G", "Ninja", "-DCMAKE_BUILD_TYPE=None",
-                    "-DCMAKE_CXX_FLAGS=-O1"], check=True, capture_output=True)
+    subprocess.run(
+        ["cmake", "-S", str(ev), "-B", str(b), "-G", "Ninja", "-DCMAKE_BUILD_TYPE=None", "-DCMAKE_CXX_FLAGS=-O1"],
+        check=True,
+        capture_output=True,
+    )
     tests = _tests_in(draft)
     if not tests or subprocess.run(["ninja", "-C", str(b), "iqk_tests"], capture_output=True).returncode != 0:
         return False, False, len(tests), 0, 0
@@ -161,7 +218,9 @@ def _evaluate(draft: Path, rid: str, work: Path) -> tuple[bool, bool, int, int, 
 
 
 def run_one(rid: str, model: str, base: Path) -> Draft:
-    req = next(r for r in yaml.safe_load((ROOT / "requirements" / "srs.yaml").read_text())["requirements"] if r["id"] == rid)
+    req = next(
+        r for r in yaml.safe_load((ROOT / "requirements" / "srs.yaml").read_text())["requirements"] if r["id"] == rid
+    )
     work = base / f"{rid}-{model}"
     ws = _workspace(work)
     s = _session(ws, model, PROMPT.format(rid=rid, title=req["title"], text=req["text"]), work / "transcript.jsonl")
@@ -173,13 +232,18 @@ def run_one(rid: str, model: str, base: Path) -> Draft:
     return Draft(rid, model, compiled, passed, n, total, killed, s["cost"], s["seconds"], s["turns"], s["denied"])
 
 
-def run(base: Path, requirements: list[str] | None = None, models: list[str] | None = None, workers: int = 2) -> list[dict]:
+def run(
+    base: Path, requirements: list[str] | None = None, models: list[str] | None = None, workers: int = 2
+) -> list[dict]:
     jobs = [(r, m) for r in (requirements or REQUIREMENTS) for m in (models or MODELS)]
     out: list[Draft] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for d in pool.map(lambda j: run_one(j[0], j[1], base), jobs):
-            print(f"{d.requirement} {d.model}: compiled={d.compiled} passed={d.passed} killed {d.killed}/{d.mutants} "
-                  f"${d.cost_usd:.3f} {d.seconds}s", flush=True)
+            print(
+                f"{d.requirement} {d.model}: compiled={d.compiled} passed={d.passed} killed {d.killed}/{d.mutants} "
+                f"${d.cost_usd:.3f} {d.seconds}s",
+                flush=True,
+            )
             out.append(d)
     return [asdict(d) for d in out]
 

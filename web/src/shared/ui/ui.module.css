@@ -1,0 +1,78 @@
+.section {
+  padding-block: var(--s-7);
+  border-top: var(--border) solid var(--rule);
+}
+.head {
+  display: grid;
+  gap: var(--s-2);
+  max-width: var(--measure);
+  margin-bottom: var(--s-5);
+}
+.title {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--w-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+}
+.lede {
+  margin: 0;
+  color: var(--ink-2);
+}
+.skeleton {
+  display: grid;
+  gap: var(--s-3);
+}
+.bar {
+  height: var(--s-4);
+  border-radius: var(--radius-s);
+  background: linear-gradient(90deg, var(--rule) 0%, var(--sheet) 50%, var(--rule) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.note {
+  border: var(--border) solid var(--rule-strong);
+  border-left-width: var(--s-1);
+  border-radius: var(--radius-m);
+  background: var(--sheet);
+  padding: var(--s-4) var(--s-5);
+  max-width: var(--measure);
+}
+.noteError {
+  composes: note;
+  border-left-color: var(--failed);
+}
+.noteEmpty {
+  composes: note;
+  border-left-color: var(--system);
+}
+.noteTitle {
+  margin: 0 0 var(--s-2);
+  font-weight: var(--w-medium);
+}
+.noteBody {
+  margin: 0 0 var(--s-3);
+  color: var(--ink-2);
+}
+.button {
+  font: inherit;
+  font-weight: var(--w-medium);
+  color: var(--sheet);
+  background: var(--ink);
+  border: 0;
+  border-radius: var(--radius-s);
+  padding: var(--s-2) var(--s-4);
+  cursor: pointer;
+}
+.code {
+  font-family: inherit;
+  font-weight: var(--w-medium);
+  background: var(--rule);
+  border-radius: var(--radius-s);
+  padding: 0 var(--s-1);
+}

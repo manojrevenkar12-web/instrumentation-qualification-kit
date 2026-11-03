@@ -1,0 +1,139 @@
+/* Design tokens. Every colour, size and duration in the console comes from here. */
+:root {
+  /* palette: a technical drawing on cool paper */
+  --paper: #f2f4f3;
+  --sheet: #fbfcfb;
+  --ink: #111a1f;
+  --ink-2: #44535a;
+  --ink-3: #6a7a81;
+  --rule: #cbd3d1;
+  --rule-strong: #95a3a4;
+  --proven: #0f6e5a;
+  --proven-soft: #d5ebe4;
+  --weak: #8a5a00;
+  --weak-soft: #f6e7c8;
+  --failed: #b3261e;
+  --failed-soft: #f8dcd9;
+  --system: #4c5f8a;
+  --system-soft: #dfe5f2;
+  --focus: #1d4ed8;
+
+  /* type */
+  --font: "Hanken Grotesk Variable", system-ui, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-s: 0.875rem;
+  --fs-m: 1rem;
+  --fs-l: 1.25rem;
+  --fs-xl: 1.75rem;
+  --fs-xxl: clamp(2rem, 1.2rem + 3.2vw, 3.25rem);
+  --lh-tight: 1.1;
+  --lh-body: 1.5;
+  --w-regular: 420;
+  --w-medium: 560;
+  --w-bold: 680;
+
+  /* space */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4.5rem;
+  --gutter: 16px;
+  --measure: 68ch;
+  --page: 1180px;
+
+  /* shape */
+  --radius-s: 3px;
+  --radius-m: 6px;
+  --tile: 22px;
+  --tile-gap: 4px;
+  --tick: 4px;
+  --border: 1px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1417;
+    --sheet: #141c20;
+    --ink: #e6ecea;
+    --ink-2: #b4c1c2;
+    --ink-3: #8b9a9c;
+    --rule: #2a363b;
+    --rule-strong: #4a5a60;
+    --proven: #5cc7a8;
+    --proven-soft: #133a31;
+    --weak: #e2b24f;
+    --weak-soft: #3d2f12;
+    --failed: #f08a80;
+    --failed-soft: #4a1d1a;
+    --system: #9fb2e0;
+    --system-soft: #1f2a44;
+    --focus: #8fb0ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1417;
+  --sheet: #141c20;
+  --ink: #e6ecea;
+  --ink-2: #b4c1c2;
+  --ink-3: #8b9a9c;
+  --rule: #2a363b;
+  --rule-strong: #4a5a60;
+  --proven: #5cc7a8;
+  --proven-soft: #133a31;
+  --weak: #e2b24f;
+  --weak-soft: #3d2f12;
+  --failed: #f08a80;
+  --failed-soft: #4a1d1a;
+  --system: #9fb2e0;
+  --system-soft: #1f2a44;
+  --focus: #8fb0ff;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-m);
+  line-height: var(--lh-body);
+  font-weight: var(--w-regular);
+  font-variant-numeric: tabular-nums;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override every component */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override every component */
+    transition-duration: 0.01ms !important;
+  }
+}

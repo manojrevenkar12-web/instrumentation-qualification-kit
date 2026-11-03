@@ -51,6 +51,9 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--seconds", type=float, default=20)
     b.add_argument("--plan", default=str(ROOT / "examples" / "plans" / "bench.plan"))
     b.add_argument("--fault", action="append", default=[])
+    b.add_argument("--report", default="", help="save a summary as reports/bench/<name>.json")
+    b.add_argument("--seed", type=int, default=7)
+    sub.add_parser("report")
     args = ap.parse_args(argv)
 
     if args.cmd == "icd":
@@ -106,7 +109,7 @@ def main(argv: list[str] | None = None) -> int:
 
             out = release.bundle(args.version, Path(args.key) if args.key else None)
             print(json.dumps(out, indent=1))
-            return 0
+            return 0 if out["pass"] else 1
 
     if args.cmd == "assurance":
         from .assurance import checks
@@ -136,7 +139,9 @@ def main(argv: list[str] | None = None) -> int:
         drafts = experiment.run(Path("/tmp/iqk-agents"), reqs, args.models.split(","))
         path = REPORTS / "agents" / "experiment.json"
         old = json.loads(path.read_text())["drafts"] if path.exists() and reqs else []
-        keep = [d for d in old if (d["requirement"], d["model"]) not in {(x["requirement"], x["model"]) for x in drafts}]
+        keep = [
+            d for d in old if (d["requirement"], d["model"]) not in {(x["requirement"], x["model"]) for x in drafts}
+        ]
         all_drafts = keep + drafts
         _write(path, {"summary": experiment.summarize(all_drafts), "drafts": all_drafts})
         print(json.dumps(experiment.summarize(all_drafts), indent=1))
@@ -150,8 +155,22 @@ def main(argv: list[str] | None = None) -> int:
             name, _, span = f.partition("@")
             lo, _, hi = span.partition("-")
             faults.append(Fault(name, float(lo or 0), float(hi or 1e9)))
-        r = Bench(ROOT / "work" / "bench", Path(args.plan).read_text(), faults).run(args.seconds)
-        print(json.dumps(r.status, indent=1))
+        r = Bench(ROOT / "work" / "bench", Path(args.plan).read_text(), faults, seed=args.seed).run(args.seconds)
+        if args.report:
+            from .report import bench_summary
+
+            s = bench_summary(r, args.report, faults)
+            _write(REPORTS / "bench" / f"{args.report}.json", s)
+            print(json.dumps({k: v for k, v in s.items() if k != "time_error_histogram"}, indent=1))
+        else:
+            print(json.dumps(r.status, indent=1))
+        return 0
+
+    if args.cmd == "report":
+        from .report import write
+
+        d = write()
+        print(f"reports/console.json: {len(d['traceability']['requirements'])} requirements")
         return 0
     return 2
 

@@ -255,6 +255,9 @@ void Dau::tick(std::int64_t local_ns, const Tx& tx) {
     load_failure_logged_ = true;
   } else if (loader_.status() == PlanLoader::Status::done && !armed_ && plan_) {
     armed_ = true;
+    for (const int node : loader_.nodes()) {
+      aam_.expect(node, local_ns);  // a module that never sends a heartbeat is lost too
+    }
   }
   if (armed_ && !nmt_sent_) {
     for (const int node : loader_.nodes()) {

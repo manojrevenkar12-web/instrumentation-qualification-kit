@@ -72,7 +72,7 @@ requirements:
   # --- acquisition modules ---------------------------------------------------------------------------------
   - id: SRS-030
     title: Module supervision
-    text: A module without heartbeat for aam.heartbeat_timeout_ms is reported lost, logged once, and fails the module built-in test.
+    text: A module without heartbeat for aam.heartbeat_timeout_ms is reported lost, logged once, and fails the module built-in test; a module the armed plan uses is supervised from arming, even if it has never sent a heartbeat.
     method: test
     cites: [config/unit.yaml#aam.heartbeat_timeout_ms]
   - id: SRS-031
